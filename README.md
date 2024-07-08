@@ -26,7 +26,7 @@ docker compose up -d
 3.) Start the uvicorn backend:
 
 ```
-uvicorn main:app --reload
+uvicorn BeispielVerwaltung:app --reload
 ```
 
 The reload command is used to be able to update the code and start the application automatically.

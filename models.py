@@ -19,10 +19,10 @@ class PyObjectId(ObjectId):
         field_schema.update(type="string")
 
 
-class SensorDataModel(BaseModel):
+class DataModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
-    temperature: Optional[int]
+    type: Optional[str]
 
     class Config:
         allow_population_by_field_name = True
@@ -30,22 +30,22 @@ class SensorDataModel(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "name": "Sensor",
-                "temperature": 300
+                "name": "Data",
+                "type": "Cool data"
             }
         }
 
 
-class SensorUpdateModel(BaseModel):
+class UpdateDataModel(BaseModel):
     name: Optional[str]
-    temperature: Optional[int]
+    type: Optional[str]
 
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "name": "New Sensor Name",
-                "temperature": 320
+                "name": "Other Data",
+                "type": "Cool data too"
             }
         }
