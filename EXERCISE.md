@@ -12,15 +12,15 @@ Benutzer alle aktuellen Werte anzuzeigen.
 
 Die Telemetrie-Daten kommen in unserem System als Dateien an. Sie enthalten Messdaten von jeweils einem Sensor. Die Sensoren senden Daten in unterschiedlichen Frequenzen. Je nach Sensor können unterschiedliche Parameter gemessen werden. (Zunächst betrachten wir nur einen Sensor-Typ)
 
-Die Dateien werden in ein bestimmtes Verzeichnis gespeichert, die Daten darin liegen im JSON-Format vor. Das System soll diese Dateien jeweils genau einmal lesen, die darin enthaltenen Daten auslesen und den Zustand der zugehörigen Parameter anpassen. Einem/einer Space Controller soll der aktuellen Zustand aller Parameter angezeigt werden.
+Die Dateien werden in ein bestimmtes Verzeichnis gespeichert, die Daten darin liegen im JSON-Format vor. Das System soll diese Dateien jeweils genau einmal lesen, die darin enthaltenen Daten auslesen und den Zustand der zugehörigen Parameter anpassen. Einem/einer Space Controller soll der aktuelle Zustand aller Parameter angezeigt werden.
 
 ## Struktur/Architektur
 
 Wir schlagen vor, das System in drei Komponenten zu unterteilen.
 
-* Die erste Komponente öffnet die Dateien, liest die enthaltenen Daten ein und  gibt sie an die zweite Komponente weiter. Außerdem sorgt sie dafür, dass bearbeitet Dateien nicht mehr bearbeitet werden.
+* Die erste Komponente öffnet die Dateien, liest die enthaltenen Daten ein und  gibt sie an die zweite Komponente weiter. Außerdem sorgt sie dafür, dass bearbeitete Dateien nicht mehr bearbeitet werden.
 
-* Die zweite Komponente verarbeitet Daten, die von der ersten Komponente geliefert werden. Sie kennt den aktuellen Zustand alle Parameter, passt die Werte bei Bedarf an und kann den Zustand auf Anfrage an die dritte Komponente ausgeben.
+* Die zweite Komponente verarbeitet Daten, die von der ersten Komponente geliefert werden. Sie kennt den aktuellen Zustand aller Parameter, passt die Werte bei Bedarf an und kann den Zustand auf Anfrage an die dritte Komponente ausgeben.
 
 * Die dritte und letzte Komponente ist für die Ausgabe der Daten an eine\*n Benutzer\*in zuständig.
 
