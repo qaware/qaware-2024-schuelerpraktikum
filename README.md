@@ -31,6 +31,12 @@ uvicorn BeispielVerwaltung:app --reload
 
 The reload command is used to be able to update the code and start the application automatically.
 
+4.) Optional: Add the database to your IDE
+
+![database_access.png](images/database_access.png)
+
+For IntelliJ, you can do that in the database menu on the right of the window. Add a new data source via the '+' icon. Select MongoDB as type and give your database a name. Enter the credentials from the [docker-compose.yml](./docker-compose.yml) file and test the connection. If necessary, download the missing driver files.
+
 ## Usage
 
 After the installation the API can be called via curl or the browser to serve the user with data or as data storage.
