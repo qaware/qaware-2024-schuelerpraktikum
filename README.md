@@ -11,6 +11,11 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
+If you created a virtual environment, set it as python interpreter in your IDE.
+In Intellij: Click on File -> Project Structure.
+Add a new Python SDK of type Virtualenv environment -> existing environment.
+Set the interpreter to the python that is located in the directory of your newly created virtual environment.
+
 1.) Install all dependencies:
 
 ```
