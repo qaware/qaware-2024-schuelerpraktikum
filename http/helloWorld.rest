@@ -1,4 +1,2 @@
-@baseUrl = http://localhost:8000
-
 ### Hello World
-GET {{baseUrl}}/hello_world 
+GET {{baseUrl}}/hello_world
