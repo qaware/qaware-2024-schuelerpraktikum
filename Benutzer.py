@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from models import DataModel, UpdateDataModel
+from models import Sensor_data, UpdateDataModel
 
 # TODO: Wie erhalten wir für uns interessante Informationen von der Verwaltung?
 # TODO: Was sind interessante Daten und welche benötigen wir unter Umständen gar nicht?
@@ -10,7 +10,7 @@ from models import DataModel, UpdateDataModel
 # TODO: Wie stellen wir die Informationen bestmöglich für den Nutzer da?
 
 if __name__ == '__main__':
-    data = DataModel(name="Test")
+    data = Sensor_data(name="Test")
     new_data = UpdateDataModel(name="Updated Test")
     answer1 = requests.post("http://127.0.0.1:8000/data/", data.json())
     answer2 = requests.put(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}", new_data.json())

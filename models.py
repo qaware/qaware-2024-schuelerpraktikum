@@ -19,10 +19,12 @@ class PyObjectId(ObjectId):
         field_schema.update(type="string")
 
 
-class DataModel(BaseModel):
+class Sensor_data(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
-    type: Optional[str]
+    type: str = Field(...)
+    value: float = Field(...)
+    time: int = Field(...)
 
     class Config:
         allow_population_by_field_name = True

@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from models import DataModel, UpdateDataModel
+from models import Sensor_data, UpdateDataModel
 
 # TODO: Einlesen und Formatierung von Dateien aus dem Ordner "data"
 # TODO: Markierung, sodass Dateien nicht doppelt gelesen werden
@@ -13,7 +13,7 @@ from models import DataModel, UpdateDataModel
 # TODO: ...
 
 if __name__ == '__main__':
-    data = DataModel(name="Test")
+    data = Sensor_data(name="Test")
     new_data = UpdateDataModel(name="Updated Test")
     answer1 = requests.post("http://127.0.0.1:8000/data/", data.json())
     answer2 = requests.put(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}", new_data.json())

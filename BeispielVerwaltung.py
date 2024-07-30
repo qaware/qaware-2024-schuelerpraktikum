@@ -10,7 +10,7 @@ from motor import motor_asyncio
 from starlette import status
 from starlette.responses import JSONResponse
 
-from models import DataModel, UpdateDataModel
+from models import Sensor_data, UpdateDataModel
 
 app = FastAPI()
 os.environ["MONGODB_URL"] = "mongodb://root:password@localhost:27017/?retryWrites=true&w=majority"
@@ -31,26 +31,26 @@ def hello_world():
     return JSONResponse(status_code=status.HTTP_200_OK, content=response)
 
 
-@app.post("/data/", response_description="Create Data", response_model=DataModel)
-async def create_data(data: DataModel):
+@app.post("/data/", response_description="Create Data", response_model=Sensor_data)
+async def create_data(data: Sensor_data):
     new_data = await db["data"].insert_one(jsonable_encoder(data))
     created_data = await db["data"].find_one({"_id": new_data.inserted_id})
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_data)
 
 
-@app.get("/data/", response_description="List All Data", response_model=List[DataModel])
+@app.get("/data/", response_description="List All Data", response_model=List[Sensor_data])
 async def list_data():
     data = await db["data"].find().to_list(1000)
     return JSONResponse(status_code=status.HTTP_200_OK, content=data)
 
 
-@app.get("/data/{id}", response_description="Read Data", response_model=DataModel)
+@app.get("/data/{id}", response_description="Read Data", response_model=Sensor_data)
 async def read_data(id: str):
     data = await db["data"].find_one({"_id": id})
     return JSONResponse(status_code=status.HTTP_200_OK, content=data)
 
 
-@app.put("/data/{id}", response_description="Update Data", response_model=DataModel)
+@app.put("/data/{id}", response_description="Update Data", response_model=Sensor_data)
 async def update_data(id: str, update: UpdateDataModel):
     await db["data"].update_one({"_id": id}, {"$set": jsonable_encoder(update)})
     updated_data = await db["data"].find_one({"_id": id})
@@ -64,7 +64,7 @@ async def delete_data(id: str):
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
 
 if __name__ == '__main__':
-    data = DataModel(name="Test")
+    data = Sensor_data(name="Test")
     new_data = UpdateDataModel(name="Updated Test")
     answer1 = requests.post("http://127.0.0.1:8000/data/", data.json())
     answer2 = requests.put(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}", new_data.json())
