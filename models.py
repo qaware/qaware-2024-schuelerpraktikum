@@ -22,7 +22,7 @@ class PyObjectId(ObjectId):
 class Sensor_data(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
-    type: str = Field(...)
+    data_type: str = Field(...)
     value: float = Field(...)
     time: int = Field(...)
 

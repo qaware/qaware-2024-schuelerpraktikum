@@ -63,11 +63,15 @@ async def delete_data(id: str):
     await db["data"].delete_one({"_id": id})
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
 """
+
+
 # Bodenstation
-@app.post("/data/doesExist", response_description="Check if Data already exists, returns true if data exists", response_model=bool)
-async def data_does_exist(type: str, name: str, time: int):
-    found_data = await db["data"].find_one({"type":type, "name":name, "time":time})
+@app.post("/data/doesExist", response_description="Check if Data already exists, returns true if data exists",
+          response_model=bool)
+async def data_does_exist(data_type: str, name: str, time: int):
+    found_data = await db["data"].find_one({"data_type": data_type, "name": name, "time": time})
     return found_data is not None
+
 
 @app.post("/data/addData", response_description="Add data, returns data added", response_model=Sensor_data)
 async def add_sensor_data(data: Sensor_data):
@@ -76,11 +80,33 @@ async def add_sensor_data(data: Sensor_data):
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_data)
 
 
+# Nutzer
+@app.post("/data/getByType", response_description="Return all data of the selected type",
+          response_model=List[Sensor_data])
+async def get_by_type(data_type: str):
+    found_data = await db["data"].find({"data_type": data_type})
+    return JSONResponse(content=found_data)
+
+
+@app.post("/data/getByName", response_description="Return all data of the selected name",
+          response_model=List[Sensor_data])
+async def get_by_type(name: str):
+    found_data = await db["data"].find({"name": name})
+    return JSONResponse(content=found_data)
+
+
+@app.post("/data/get", response_description="Return all data of the selected type and name",
+          response_model=List[Sensor_data])
+async def get_by_type(data_type: str, name: str):
+    found_data = await db["data"].find({"data_type": data_type, "name": name})
+    return JSONResponse(content=found_data)
+
+
 
 if __name__ == '__main__':
-    data = Sensor_data(name="Test")
+    sens_data = Sensor_data(name="Test")
     new_data = UpdateDataModel(name="Updated Test")
-    answer1 = requests.post("http://127.0.0.1:8000/data/", data.json())
+    answer1 = requests.post("http://127.0.0.1:8000/data/", sens_data.json())
     answer2 = requests.put(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}", new_data.json())
     answer3 = requests.delete(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}")
     answer4 = requests.get(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}")
