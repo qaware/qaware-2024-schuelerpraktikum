@@ -1,3 +1,4 @@
+import json
 import os
 from typing import List
 
@@ -80,22 +81,52 @@ async def add_sensor_data(data: SensorData):
 
 
 # Nutzer
-@app.get("/data/get/{data_type}", response_description="Return all data of the selected type",
+@app.get("/data/getType/{data_type}", response_description="Return all data of the selected type",
          response_model=List[SensorData])
 async def get_by_type(data_type: str):
     found_data = await db["data"].find({"data_type": data_type}).to_list(1000)
     return JSONResponse(content=found_data)
 
 
-@app.get("/data/get/{name}", response_description="Return all data of the selected name",
+@app.get("/data/getName/{name}", response_description="Return all data of the selected name",
          response_model=List[SensorData])
 async def get_by_type(name: str):
     found_data = await db["data"].find({"name": name}).to_list(1000)
     return JSONResponse(content=found_data)
 
 
-@app.get("/data/get/{data_type,name}", response_description="Return all data of the selected type and name",
+@app.get("/data/getTypeName/{data_type}/{name}", response_description="Return all data of the selected type and name",
          response_model=List[SensorData])
 async def get_by_type(data_type: str, name: str):
     found_data = await db["data"].find({"data_type": data_type, "name": name}).to_list(1000)
     return JSONResponse(content=found_data)
+
+
+@app.get("/data/getTimeType/{time}/{data_type}", response_description="Return all data of the selected type",
+         response_model=List[SensorData])
+async def get_by_type(time:str, data_type: str):
+    found_data = await db["data"].find({"data_type": data_type}).to_list(1000)
+    return JSONResponse(content=filter_by_time(time, found_data))
+
+
+@app.get("/data/getTimeName/{time}/{name}", response_description="Return all data of the selected name",
+         response_model=List[SensorData])
+async def get_by_type(time:str, name: str):
+    found_data = await db["data"].find({"name": name}).to_list(1000)
+    return JSONResponse(content=filter_by_time(time, found_data))
+
+
+@app.get("/data/getTimeTypeName/{time}/{data_type}/{name}", response_description="Return all data of the selected type and name",
+         response_model=List[SensorData])
+async def get_by_type(time: str, data_type: str, name: str):
+    found_data = await db["data"].find({"data_type": data_type, "name": name}).to_list(1000)
+    return JSONResponse(content=filter_by_time(time, found_data))
+
+
+def filter_by_time(time: str, data):
+    return_data = []
+    timestamp = int(time)
+    for obj in data:
+        if int(obj["time"]) > timestamp:
+            return_data.append(obj)
+    return return_data
