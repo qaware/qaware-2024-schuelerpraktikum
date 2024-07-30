@@ -67,6 +67,18 @@ class DataGenerator:
             time=int(time.time())
         )
 
+        er  = random.randint(0,4)
+        if er == 0:
+            er = random.randint(0,3)
+            if er == 0:
+                sensor_data.name = None
+            elif er == 1:
+                sensor_data.data_type = None
+            elif er == 2:
+                sensor_data.value = None
+            else:
+                sensor_data.time = None
+
         return sensor_data
 
     @staticmethod
