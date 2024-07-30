@@ -24,7 +24,7 @@ db = client.get_database("data")
 # TODO: Was gehört zur Verwaltung der Daten noch?
 # TODO: Benötigen wir noch andere Schnittstellen für unsere Nutzer?
 
-
+"""
 @app.get("/hello_world", response_description="Hello World")
 def hello_world():
     response = "Hello World"
@@ -62,6 +62,20 @@ async def update_data(id: str, update: UpdateDataModel):
 async def delete_data(id: str):
     await db["data"].delete_one({"_id": id})
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
+"""
+# Bodenstation
+@app.post("/data/doesExist", response_description="Check if Data already exists, returns true if data exists", response_model=bool)
+async def data_does_exist(type: str, name: str, time: int):
+    found_data = await db["data"].find_one({"type":type, "name":name, "time":time})
+    return found_data is not None
+
+@app.post("/data/addData", response_description="Add data, returns data added", response_model=Sensor_data)
+async def add_sensor_data(data: Sensor_data):
+    new_data = await db["data"].insert_one(jsonable_encoder(data))
+    created_data = await db["data"].find_one({"_id": new_data.inserted_id})
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_data)
+
+
 
 if __name__ == '__main__':
     data = Sensor_data(name="Test")
