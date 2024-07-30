@@ -16,11 +16,18 @@ class Bodenstation(object):
     def __init__(self,path: str):
         self.path = path
 
+    def work(self):
+        x = self.read()
+        self.check(x[0],x[1])
+
     def read(self):
         path = self.path + 'TM_2024-07-30T13:43:41.893367.json'
         data = open(path, 'r', encoding='utf-8')
         data = json.load(data)
-        print(data['data_type'])
+        #os.remove(path)
+        return [data,path]
+
+    def check(self,data,path):
         l = []
         for nils in data:
             l.append(nils)
@@ -28,10 +35,9 @@ class Bodenstation(object):
         for nils in l:
             l2.append(data[nils])
         if None in l2:
-            os.remove(path)
-            return
-        else:
-            pass
+            return False
+
+
 
 
 b = Bodenstation('data/')
