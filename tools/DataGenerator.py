@@ -85,6 +85,8 @@ class DataGenerator:
     def store_sensor_data(data: Sensor):
         content = data.__dict__
         file_name = "/data/TM_" + datetime.datetime.now().isoformat() + ".json"
+        if not os.path.exists(BASE_PATH+ "/data/"):
+            os.makedirs(BASE_PATH+ "/data/")
         with open(BASE_PATH + file_name, "w") as file:
             json.dump(content, file)
 

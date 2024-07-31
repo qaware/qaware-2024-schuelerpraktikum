@@ -30,10 +30,14 @@ class Bodenstation(object):
         for nils in l:
             l2.append(ak_data[nils])
         if None in l2:
+            print('Datei fehlerhaft')
             return False
         answer = requests.get(f"http://127.0.0.1:8000/data/doesExist/{ak_data['data_type']}/{ak_data['name']}/{ak_data['time']}")
         if answer.content == False:
+            print('Daten bereits vorhanden')
             return False
         data_obj = SensorData(name=ak_data['name'],time=ak_data['time'],data_type=ak_data['data_type'],value=ak_data['value'])
-        x = requests.post(f"htp://127.0.0.1:8000/data/addData",data_obj.json())
+        x = requests.post(f"http://127.0.0.1:8000/data/addData",data_obj.json())
         print(x.content)
+b = Bodenstation('data/')
+b.work()
