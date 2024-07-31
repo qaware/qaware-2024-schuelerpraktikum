@@ -1,6 +1,7 @@
 import json
 import os
 from typing import List
+import asyncio
 
 import motor
 from fastapi import FastAPI
@@ -78,6 +79,32 @@ async def get_by_time_type_name(time: str, data_type: str, name: str):
     return JSONResponse(content=filter_by_time(time, found_data))
 
 
+@app.get("/data/allTypes/", response_model=List[str], response_description="Get all unique types")
+async def all_types():
+    found_types = await db["data"].distinct("data_type")
+    return JSONResponse(content=found_types)
+
+
+@app.get("/data/allNames/", response_model=List[str], response_description="Get all unique names")
+async def all_names():
+    found_types = await db["data"].distinct("name")
+    return JSONResponse(content=found_types)
+
+
+@app.get("/data/typesByName/{name}", response_model=List[str],
+         response_description="Get all unique types, for the given name")
+async def types_by_name(name: str):
+    found_types = await db["data"].distinct("data_type", filter={"name": name})
+    return JSONResponse(content=found_types)
+
+
+@app.get("/data/namesByType/{data_type}", response_model=List[str],
+         response_description="Get all unique names, for the given type")
+async def names_by_type(data_type: str):
+    found_types = await db["data"].distinct("name", filter={"data_type": data_type})
+    return JSONResponse(content=found_types)
+
+
 def filter_by_time(time: str, data: List):
     return_data = []
     timestamp = int(time)
@@ -89,3 +116,10 @@ def filter_by_time(time: str, data: List):
 
 async def find_data(args: dict[str, str]):
     return await db["data"].find(args).to_list(1000)
+
+
+async def main():
+    print(await db["data"].distinct("time", ))
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
