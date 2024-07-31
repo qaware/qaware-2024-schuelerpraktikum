@@ -90,28 +90,28 @@ async def get_by_type(data_type: str):
 
 @app.get("/data/getName/{name}", response_description="Return all data of the selected name",
          response_model=List[SensorData])
-async def get_by_type(name: str):
+async def get_by_name(name: str):
     found_data = await find_data({"name": name})
     return JSONResponse(content=found_data)
 
 
 @app.get("/data/getTypeName/{data_type}/{name}", response_description="Return all data of the selected type and name",
          response_model=List[SensorData])
-async def get_by_type(data_type: str, name: str):
+async def get_by_type_name(data_type: str, name: str):
     found_data = await find_data({"data_type": data_type, "name": name})
     return JSONResponse(content=found_data)
 
 
 @app.get("/data/getTimeType/{time}/{data_type}", response_description="Return all data of the selected type",
          response_model=List[SensorData])
-async def get_by_type(time: str, data_type: str):
+async def get_by_time_type(time: str, data_type: str):
     found_data = await find_data({"data_type": data_type})
     return JSONResponse(content=filter_by_time(time, found_data))
 
 
 @app.get("/data/getTimeName/{time}/{name}", response_description="Return all data of the selected name",
          response_model=List[SensorData])
-async def get_by_type(time: str, name: str):
+async def get_by_time_name(time: str, name: str):
     found_data = await find_data({"name": name})
     return JSONResponse(content=filter_by_time(time, found_data))
 
@@ -119,7 +119,7 @@ async def get_by_type(time: str, name: str):
 @app.get("/data/getTimeTypeName/{time}/{data_type}/{name}",
          response_description="Return all data of the selected type and name",
          response_model=List[SensorData])
-async def get_by_type(time: str, data_type: str, name: str):
+async def get_by_time_type_name(time: str, data_type: str, name: str):
     found_data = await find_data({"data_type": data_type, "name": name})
     return JSONResponse(content=filter_by_time(time, found_data))
 
