@@ -35,4 +35,5 @@ class Bodenstation(object):
         if answer.content == False:
             return False
         data_obj = SensorData(name=ak_data['name'],time=ak_data['time'],data_type=ak_data['data_type'],value=ak_data['value'])
-        requests.post(f"htp://127.0.0.1:8000/data/addData",data_obj.json())
+        x = requests.post(f"htp://127.0.0.1:8000/data/addData",data_obj.json())
+        print(x.content)
