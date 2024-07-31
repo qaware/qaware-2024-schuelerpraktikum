@@ -15,7 +15,7 @@ class Animation(object):
         self.colors = colors
 
     def sensorKnotrollscreen_Start(self, fenster,anzahlTypen):
-        anzahlTypen = 3
+        anzahlTypen = 1
 
         #statische Objekte werden gezeichnet
         fenster.fill(self.colors.black)
@@ -27,12 +27,12 @@ class Animation(object):
         py.draw.rect(fenster, self.colors.white, [self.display.getScreenWidth()*0.22, self.display.getScreenHeight()*0.05,self.display.getScreenWidth()*0.35, (self.display.getScreenHeight()*0.61)], border_radius=10)
         py.draw.rect(fenster, self.colors.white, [self.display.getScreenWidth()*0.6, self.display.getScreenHeight()*0.35,self.display.getScreenWidth()*0.35, (self.display.getScreenHeight()*0.61)], border_radius=10)
 
-    def sensorKontrollScreen_Start_dynamisch(self):
+    def sensorKontrollScreen_Start_dynamisch(self,data):
         fenster = py.display.set_mode((self.display.getScreenWidth(),self.display.getScreenHeight()))
         py.display.set_caption("Satellitenkontrollprogramm")
         clock = py.time.Clock()
-        anzahlTypen = 3
-        self.sensorKnotrollscreen_Start(fenster,anzahlTypen)
+        data_typen = getAnzahlTypenausDaten(data)
+        self.sensorKnotrollscreen_Start(fenster,len(data_typen))
         while True:
             for event in py.event.get():
                 # Beenden bei [ESC] oder [X]
@@ -43,19 +43,20 @@ class Animation(object):
             py.display.flip()
             clock.tick(self.display.getFPS())
 
+def datenopen():
+    for x in open("Example_data.json","r"):
+        print(x)
+
+def getAnzahlTypenausDaten(data):
+    data_typen = []
+    for messung in data:
+        if data[messung]["type"] not in data_typen:
+            data_typen += [data[messung]["type"]]
+    return data_typen
+
 if __name__ == '__main__':
-    #data = Sensor_data(name="Test")
-    py.init()
+    data = {"data": {"type": "thruster", "name": "thruster_3.c", "val": 8.703344683253974, "time": 215.2221422943402},"data2":{"type": "thruster", "name": "thruster_3.c", "val": 8.703344683253974, "time": 215.2221422943402}}
     screen = Screen()
     colors = Colors()
     animation = Animation(screen,colors)
-    animation.sensorKontrollScreen_Start_dynamisch()
-    """new_data = UpdateDataModel(name="Updated Test")
-    answer1 = requests.post("http://127.0.0.1:8000/data/", data.json())
-    answer2 = requests.put(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}", new_data.json())
-    answer3 = requests.delete(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}")
-    answer4 = requests.get(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}")
-    print(answer1.content)
-    print(answer2.content)
-    print(answer3.content)
-    print(answer4.content)"""
+    animation.sensorKontrollScreen_Start_dynamisch(data)
