@@ -1,6 +1,7 @@
 import json
 import requests
-from models import Sensor_data, UpdateDataModel
+import os
+#from models import Sensor_data, UpdateDataModel
 
 from BenutzerData import *
 # TODO: Wie erhalten wir für uns interessante Informationen von der Verwaltung?
@@ -16,7 +17,7 @@ class Animation(object):
 
     def sensorKnotrollscreen_Start(self, fenster,data_typen):
         #statische Objekte werden gezeichnet
-        fenster.fill(self.colors.black)
+        fenster.blit(py.image.load(os.path.join('images', 'space.jpg')),(0,0))
         # dynamischer Hintergrund für die Sensorentypen
         for x in range(len(data_typen)):
             py.draw.rect(fenster,self.colors.white,[self.display.getScreenWidth()*0.05,self.display.getScreenHeight()*0.05+self.display.getScreenHeight()*(0.95/len(data_typen))*x, self.display.getScreenWidth()//6.67,self.display.getScreenHeight()*(0.85/len(data_typen))],border_radius=10)
