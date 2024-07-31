@@ -7,6 +7,12 @@ from models import SensorData, UpdateDataModel
 class Bodenstation(object):
     def __init__(self,path: str):
         self.path = path
+        self.fehlerspeicher = {'thruster_1.a': [],
+                               'thruster_1.b': [],
+                               'oxygen_tank_1': [],
+                               'oxygen_tank_2': [],
+                               'unkown': []}
+
 
     def work(self):
         x = self.read()
@@ -31,6 +37,7 @@ class Bodenstation(object):
             l2.append(ak_data[nils])
         if None in l2:
             print('Datei fehlerhaft')
+            self.recycle(ak_data)
             return False
         answer = requests.get(f"http://127.0.0.1:8000/data/doesExist/{ak_data['data_type']}/{ak_data['name']}/{ak_data['time']}")
         if answer.content == False:
@@ -39,5 +46,27 @@ class Bodenstation(object):
         data_obj = SensorData(name=ak_data['name'],time=ak_data['time'],data_type=ak_data['data_type'],value=ak_data['value'])
         x = requests.post(f"http://127.0.0.1:8000/data/addData",data_obj.json())
         print(x.content)
+
+    def recycle(self,ak_data):
+        pruef = []
+        if not ak_data['time'] == None and not ak_data['name'] == False:
+            self.fehlerspeicher[ak_data['name']].append(ak_data['time'])
+            pruef = [ak_data['name'],ak_data['time']]
+        elif not ak_data['name'] == None:
+            self.fehlerspeicher[ak_data['name']].append('unkown')
+        elif not ak_data['time'] == None:
+            self.fehlerspeicher['unkown'].append(ak_data['time'])
+            pruef = ['unkown',ak_data['time']]
+        else:
+            self.fehlerspeicher['unkown'].append('unkown')
+        if len(pruef) > 0:
+            l = self.fehlerspeicher[pruef[0]]
+            if len(l) >= 3:
+                dif = (l[0]-l[1])+(l[1]-l[2])
+                if dif <= 8:
+                    print('Warning! Sensor ' + str(pruef[0]) + 'hat wahrscheinlich eine Funktionsstörung!')
+
+
+
 b = Bodenstation('data/')
 b.work()
