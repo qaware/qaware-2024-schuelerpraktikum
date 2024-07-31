@@ -49,3 +49,17 @@ class UpdateDataModel(BaseModel):
                 "type": "Cool data too"
             }
         }
+
+class RawSensorData(BaseModel):
+    name: Optional[str]
+    type: Optional[str]
+
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "name": "Other Data",
+                "type": "Cool data too"
+            }
+        }
