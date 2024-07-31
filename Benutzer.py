@@ -73,14 +73,48 @@ def getSensorenNamen(data):
     for messung in data:
         if data[messung]["data_type"] not in sensoren_namen.keys():
             sensoren_namen[data[messung]["data_type"]] = [data[messung]["name"]]
-        else:
+        elif data[messung]["name"] not in sensoren_namen[data[messung]["data_type"]]:
             sensoren_namen[data[messung]["data_type"]] += [data[messung]["name"]]
     return sensoren_namen
 
+def getMessdatenvonSensor(data,name=0):
+    messdaten = {}
+    for messung in data:
+        if name == 0:
+            if data[messung]["name"] not in messdaten.keys():
+                messdaten[data[messung]["name"]] = [data[messung]["val"]]
+            else:
+                messdaten[data[messung]["name"]] += [data[messung]["val"]]
+        else:
+            if messung == name and data[messung] not in messdaten.keys():
+                messdaten[data[messung]["name"]] = [data[messung]["val"]]
+            else:
+                messdaten[data[messung]["name"]] += [data[messung]["val"]]
+    return messdaten
+
+def getMinundMaxfromData(messdaten):
+    minMaxData = {}
+    gesMin = float("inf")
+    gesMax = 0
+    for sensor in messdaten:
+        min = float("inf")
+        max = 0
+        for messdata in messdaten[sensor]:
+            if messdata > max:
+                max = messdata
+            if messdata < min:
+                min = messdata
+            if messdata > gesMax:
+                gesMax = messdata
+            if messdata < gesMin:
+                gesMin = messdata
+        minMaxData[sensor] = {"min": min, "max":max}
+    return minMaxData, gesMin, gesMax
 
 if __name__ == '__main__':
     py.init()
-    data = {"data": {"data_type": "thruster", "name": "thruster_3.c", "val": 8.703344683253974, "time": 215.2221422943402},"data2":{"data_type": "temperatur", "name": "thruster_3.c", "val": 8.703344683253974, "time": 215.2221422943402},"data3":{"data_type": "temperatur", "name": "thruster_3.c", "val": 8.703344683253974, "time": 215.2221422943402}}
+    data = {"data": {"data_type": "thruster", "name": "thruster_3.c", "val": 8.703344683253974, "time": 215.2221422943402},"data2":{"data_type": "temperatur", "name": "temp1", "val": 8.703344683253974, "time": 215.2221422943402},"data3":{"data_type": "temperatur", "name": "temp2", "val": 8.703344683253974, "time": 215.2221422943402}}
+    print(getMinundMaxfromData(getMessdatenvonSensor(data)))
     screen = Screen()
     colors = Colors()
     fonts = Fonts()
