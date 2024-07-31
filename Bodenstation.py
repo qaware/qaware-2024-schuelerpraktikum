@@ -2,15 +2,7 @@ import json
 import os
 import requests
 
-from models import Sensor_data, UpdateDataModel
-
-# TODO: Einlesen und Formatierung von Dateien aus dem Ordner "data"
-# TODO: Markierung, sodass Dateien nicht doppelt gelesen werden
-# TODO: Wie gehen wir mit beschädigten oder fehlerhaften Dateien um?
-# TODO: Welche Daten sind interessant für uns?
-# TODO: Wie finden wir heraus, ob bereits Sensordaten existieren?
-# TODO: Wie senden wir Dateien an die Verwaltung?
-# TODO: ...
+from models import SensorData, UpdateDataModel
 
 class Bodenstation(object):
     def __init__(self,path: str):
@@ -27,7 +19,7 @@ class Bodenstation(object):
         path = self.path + all_data[0]
         ak_data = open(path, 'r', encoding='utf-8')
         ak_data = json.load(ak_data)
-        #os.remove(path)
+        os.remove(path)
         return [ak_data,path]
 
     def check(self,ak_data,path):
@@ -39,21 +31,8 @@ class Bodenstation(object):
             l2.append(ak_data[nils])
         if None in l2:
             return False
-
-
-b = Bodenstation('data/')
-b.work()
-
-
-
-if __name__ == '__main__++++':
-    data = Sensor_data(name="Test")
-    new_data = UpdateDataModel(name="Updated Test")
-    answer1 = requests.post("http://127.0.0.1:8000/data/", data.json())
-    answer2 = requests.put(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}", new_data.json())
-    answer3 = requests.delete(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}")
-    answer4 = requests.get(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}")
-    print(answer1.content)
-    print(answer2.content)
-    print(answer3.content)
-    print(answer4.content)
+        answer = requests.get(f"http://127.0.0.1:8000/data/doesExist/{ak_data['data_type']}/{ak_data['name']}/{ak_data['time']}")
+        if answer.content == False:
+            return False
+        data_obj = SensorData(name=ak_data['name'],time=ak_data['time'],data_type=ak_data['data_type'],value=ak_data['value'])
+        requests.post(f"htp://127.0.0.1:8000/data/addData",data_obj.json())
