@@ -16,13 +16,13 @@ class PyObjectId(ObjectId):
 
     @classmethod
     def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
+        field_schema.update(data_type="string")
 
 
-class Sensor_data(BaseModel):
+class SensorData(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
-    type: str = Field(...)
+    data_type: str = Field(...)
     value: float = Field(...)
     time: int = Field(...)
 
@@ -33,14 +33,14 @@ class Sensor_data(BaseModel):
         schema_extra = {
             "example": {
                 "name": "Data",
-                "type": "Cool data"
+                "data_type": "Cool data"
             }
         }
 
 
 class UpdateDataModel(BaseModel):
     name: Optional[str]
-    type: Optional[str]
+    data_type: Optional[str]
 
     class Config:
         arbitrary_types_allowed = True
@@ -48,6 +48,6 @@ class UpdateDataModel(BaseModel):
         schema_extra = {
             "example": {
                 "name": "Other Data",
-                "type": "Cool data too"
+                "data_type": "Cool data too"
             }
         }
