@@ -1,0 +1,33 @@
+//database structure
+{
+  "thruster": {
+    "thruster_3.b": [
+      {
+        "pressure": 0.222,
+        "temperature": 0.22,
+        "timestamp": 12887729
+      },
+      {
+        "pressure": 0.2322,
+        "temperature": 0.32,
+        "timestamp": 12887398
+      }
+    ],
+    "thruster_3.a": [
+      //analogue
+    ]
+  },
+  "gas_valve": {
+    // analogue
+  }
+}
+//fetched inputs
+[
+  {
+    "name": "",
+    "type": "",
+    "pressure": "",
+    "temperature": "",
+    "timestamp": 0001
+  }
+]
