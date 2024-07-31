@@ -1,7 +1,5 @@
-import json
 import os
 from typing import List
-import asyncio
 
 import motor
 from fastapi import FastAPI
@@ -116,10 +114,3 @@ def filter_by_time(time: str, data: List):
 
 async def find_data(args: dict[str, str]):
     return await db["data"].find(args).to_list(1000)
-
-
-async def main():
-    print(await db["data"].distinct("time", ))
-
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
