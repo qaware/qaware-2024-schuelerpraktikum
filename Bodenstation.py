@@ -21,27 +21,28 @@ class Bodenstation(object):
         self.check(x[0],x[1])
 
     def read(self):
-        path = self.path + 'TM_2024-07-30T13:43:41.893367.json'
-        data = open(path, 'r', encoding='utf-8')
-        data = json.load(data)
+        all_data = []
+        for nils in os.listdir('data'):
+            all_data.append(nils)
+        path = self.path + all_data[0]
+        ak_data = open(path, 'r', encoding='utf-8')
+        ak_data = json.load(ak_data)
         #os.remove(path)
-        return [data,path]
+        return [ak_data,path]
 
-    def check(self,data,path):
+    def check(self,ak_data,path):
         l = []
-        for nils in data:
+        for nils in ak_data:
             l.append(nils)
         l2 = []
         for nils in l:
-            l2.append(data[nils])
+            l2.append(ak_data[nils])
         if None in l2:
             return False
 
 
-
-
 b = Bodenstation('data/')
-b.read()
+b.work()
 
 
 
