@@ -1,9 +1,7 @@
-import pygame as py
-
 class Screen(object):
     def __init__(self):
-        self.screen_width = 1000
-        self.screen_height = 600
+        self.screen_width = 1300
+        self.screen_height = 700
         self.fps = 60
 
     def getScreenHeight(self):
