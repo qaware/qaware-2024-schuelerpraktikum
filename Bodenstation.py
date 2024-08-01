@@ -30,11 +30,17 @@ class Bodenstation(object):
 
     def check(self,ak_data,path):
         l = []
+        l2 = []
         for nils in ak_data:
             l.append(nils)
-        l2 = []
-        for nils in l:
             l2.append(ak_data[nils])
+        #if (not 'type' in l or not 'value' in l) and 'name' in l and 'time' in l:
+        #    print('Datei fehlerhaft')
+        #    if not ak_data['name'] == None and not ak_data['time'] == None:
+        #        self.recycle(ak_data)
+        #    else:
+        #        pass
+        #    return False
         if None in l2:
             print('Datei fehlerhaft')
             self.recycle(ak_data)
@@ -46,14 +52,24 @@ class Bodenstation(object):
         data_obj = SensorData(name=ak_data['name'],time=ak_data['time'],data_type=ak_data['data_type'],value=ak_data['value'])
         x = requests.post(f"http://127.0.0.1:8000/data/addData",data_obj.json())
         print(x.content)
+        return x.content
 
     def recycle(self,ak_data):
         pruef = []
         if not ak_data['time'] == None and not ak_data['name'] == False:
-            self.fehlerspeicher[ak_data['name']].append(ak_data['time'])
+            try:
+                self.fehlerspeicher[ak_data['name']].append(ak_data['time'])
+            except:
+                self.fehlerspeicher[ak_data['name']] = []
+                self.fehlerspeicher[ak_data['name']].append(ak_data['time'])
             pruef = [ak_data['name'],ak_data['time']]
         elif not ak_data['name'] == None:
-            self.fehlerspeicher[ak_data['name']].append('unkown')
+            try:
+                self.fehlerspeicher[ak_data['name']].append('unkown')
+            except:
+                self.fehlerspeicher[ak_data['name']] = []
+                self.fehlerspeicher[ak_data['name']].append('unkown')
+
         elif not ak_data['time'] == None:
             self.fehlerspeicher['unkown'].append(ak_data['time'])
             pruef = ['unkown',ak_data['time']]
