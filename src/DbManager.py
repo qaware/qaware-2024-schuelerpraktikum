@@ -14,24 +14,38 @@ client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
 db = client.get_database("data")
 
 
-@app.get("/return-db", response_description="Returned database dict")
-async def returnDB():
+async def get_latest_db_contents():
     db_contents = await db["data"].find().to_list(1)  # [{'_id': ObjectId('66ab3cfc7e7a9c72fbac78c8'), 'data': {}}]
 
     # db is created in appendToDb if empty
-    print("!", db_contents)
     if len(db_contents) == 0:
         print("Empty db")
         latest_data = {}
     else:
-        latest_data = db_contents[-1]['data']
+        latest_data = db_contents[-1]
+
+    return latest_data
+
+
+@app.get("/return-db", response_description="Returned database dict")
+async def returnDB():
+    latest_content = await get_latest_db_contents()
+    latest_data = latest_content["data"]
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=latest_data)
 
 
+@app.get("/get-id", response_description="Returned database dict id")
+async def returnDB():
+    latest_content = await get_latest_db_contents()
+    latest_id = latest_content["_id"]
+    return JSONResponse(status_code=status.HTTP_200_OK, content=latest_id)
+
+
 @app.post("/save", response_description="Initial")
-async def saveDB(new_db={"data": "AAAAAAAAAA"}):
-    await db["data"].update_data(new_db)
+async def saveDB():
+    print("!!")
+    await db["data"].update_data({"data": "t22"})
 
 
 @app.get("/append-to-db", response_description="Returned database dict")
@@ -59,6 +73,7 @@ async def createDB():
 
 
 if __name__ == '__main__':
+    # resp1 = requests.post("http://127.0.0.1:8000/create")
     resp1 = requests.post("http://127.0.0.1:8000/save")
     resp1 = requests.get("http://127.0.0.1:8000/return-db")
     print(resp1.status_code, resp1.content)
