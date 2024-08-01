@@ -1,6 +1,8 @@
 import json
 import os
 import requests
+import os.path
+from time import sleep
 
 from models import SensorData, UpdateDataModel
 
@@ -16,7 +18,8 @@ class Bodenstation(object):
 
     def work(self):
         x = self.read()
-        self.check(x[0],x[1])
+        if not x == False:
+            self.check(x[0],x[1])
 
     def read(self):
         all_data = []
@@ -27,7 +30,7 @@ class Bodenstation(object):
             path = self.path + all_data[0]
         except IndexError:
             print('Keine Datei zum einlesen vorhanden')
-            return True
+            return False
         ak_data = open(path, 'r', encoding='utf-8')
         ak_data = json.load(ak_data)
         os.remove(path)
@@ -68,7 +71,7 @@ class Bodenstation(object):
 
     def recycle(self,ak_data):
         pruef = []
-        if not ak_data['time'] == None and not ak_data['name'] == False:
+        if not ak_data['time'] == None and not ak_data['name'] == None:
             try:
                 self.fehlerspeicher[ak_data['name']].append(ak_data['time'])
             except:
@@ -102,9 +105,20 @@ class Bodenstation(object):
         for nils in self.fehlerspeicher:
             print(nils + ': ' + str(self.fehlerspeicher[nils]))
 
+    def log(self):
+        BASE_PATH = os.path.dirname(os.path.dirname(__file__))
+        file_name = 'fehlerspeicher/log.json'
+        if not os.path.exists("fehlerspeicher/"):
+            os.makedirs("fehlerspeicher/")
+        with open(file_name, "w") as file:
+            json.dump(self.fehlerspeicher, file)
+
+
 
 
 
 b = Bodenstation('data/')
-b.work()
-b.auslesen()
+while True:
+    b.work()
+    b.log()
+    sleep(2)
