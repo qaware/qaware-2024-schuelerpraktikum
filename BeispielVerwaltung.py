@@ -1,8 +1,9 @@
 import os
 from typing import List
 
-from scheduler import Scheduler
 import datetime as dt
+
+from bson.json_util import dumps, loads
 
 import motor
 from fastapi import FastAPI
@@ -26,6 +27,7 @@ db = client.get_database("data")
          response_model=bool)
 async def data_does_exist(data_type: str, name: str, time: str):
     found_data = await db["data"].find_one({"data_type": data_type, "name": name, "time": int(time)})
+    await database_backup()
     return JSONResponse(status_code=200, content=found_data is not None)
 
 
@@ -118,11 +120,13 @@ def filter_by_time(time: str, data: List):
 async def find_data(args: dict[str, str]):
     return await db["data"].find(args).to_list(1000)
 
-schedule = Scheduler()
-
 
 async def database_backup():
-    os.system(f"mongodump --uri=\"mongodb://root:password@localhost:27017/?retryWrites=true&w=majority\" "
-              f"--db=\"data\" --out=\"./dump/{dt.datetime.isoformat(dt.datetime.now())}")
+    print("saving database")
+    data = dumps(await db["data"].find().to_list(1000))
+    savefile = open(f"./dumps/dump_{dt.datetime.isoformat(dt.datetime.now())}.json", "w")
+    savefile.write(data)
+    savefile.close()
 
-schedule.cyclic(dt.timedelta(minutes=10), database_backup)
+
+os.makedirs("./dumps/", exist_ok=True)
