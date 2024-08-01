@@ -59,7 +59,6 @@ class DataGenerator:
         elif selected_key.type == 'thruster':
             value = random.uniform(200,500)
 
-
         sensor_data = Sensor(
             name=selected_key.name,
             data_type=selected_key.type,
@@ -84,6 +83,17 @@ class DataGenerator:
     @staticmethod
     def store_sensor_data(data: Sensor):
         content = data.__dict__
+        er = random.randint(0,4)
+        if er == 0:
+            er = random.randint(0,3)
+            if er == 0:
+                content.pop('name')
+            elif er == 1:
+                content.pop('data_type')
+            elif er == 2:
+                content.pop('time')
+            else:
+                content.pop('value')
         file_name = "/data/TM_" + datetime.datetime.now().isoformat() + ".json"
         if not os.path.exists(BASE_PATH+ "/data/"):
             os.makedirs(BASE_PATH+ "/data/")
