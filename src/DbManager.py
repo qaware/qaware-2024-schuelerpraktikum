@@ -16,19 +16,20 @@ db = client.get_database("data")
 
 @app.get("/return-db", response_description="Returned database dict")
 async def returnDB():
-    data = await db["data"].find().to_list(1) # TODO: data structure unklar
-    latest_data = None
+    db_contents = await db["data"].find().to_list(1)  # [{'_id': ObjectId('66ab3cfc7e7a9c72fbac78c8'), 'data': {}}]
+
     # db is created in appendToDb if empty
-    if len(data) == 0:
+    print("!", db_contents)
+    if len(db_contents) == 0:
         print("Empty db")
         latest_data = {}
     else:
-        latest_data = data[-1]
+        latest_data = db_contents[-1]['data']
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=latest_data)
 
 
-@app.get("/return-db", response_description="Returned database dict")
+@app.get("/append-to-db", response_description="Returned database dict")
 async def appendToDB(new_raw_data):
     current_db = await returnDB()
     current_sensor_db = current_db[new_raw_data["type"]][new_raw_data["name"]]
@@ -50,7 +51,6 @@ async def createDB():
     json = jsonable_encoder(initial_data)
     await db["data"].insert_one(json)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content="")
-
 
 
 if __name__ == '__main__':
