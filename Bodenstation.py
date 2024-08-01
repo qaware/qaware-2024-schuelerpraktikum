@@ -22,7 +22,12 @@ class Bodenstation(object):
         all_data = []
         for nils in os.listdir('data'):
             all_data.append(nils)
-        path = self.path + all_data[0]
+            break
+        try:
+            path = self.path + all_data[0]
+        except IndexError:
+            print('Keine Datei zum einlesen vorhanden')
+            return True
         ak_data = open(path, 'r', encoding='utf-8')
         ak_data = json.load(ak_data)
         os.remove(path)
@@ -34,15 +39,22 @@ class Bodenstation(object):
         for nils in ak_data:
             l.append(nils)
             l2.append(ak_data[nils])
-        #if (not 'type' in l or not 'value' in l) and 'name' in l and 'time' in l:
-        #    print('Datei fehlerhaft')
-        #    if not ak_data['name'] == None and not ak_data['time'] == None:
-        #        self.recycle(ak_data)
-        #    else:
-        #        pass
-        #    return False
+        if (not 'data_type' in l or not 'value' in l) and 'name' in l and 'time' in l:
+            print('Datei fehlerhaft-unvollständig-a')
+            self.recycle(ak_data)
+            return False
+        elif not 'name' in l or not 'time' in l:
+            print('Datei fehlerhaft-unvollständig-b')
+            if 'name' in l and not ak_data['name'] == None:
+                self.fehlerspeicher[ak_data['name']].append('unkown')
+            elif 'time' in l and not ak_data['time'] == None:
+                self.fehlerspeicher['unkown'].append(ak_data['time'])
+            else:
+                self.fehlerspeicher['unkown'].append('unkown')
+            return False
+
         if None in l2:
-            print('Datei fehlerhaft')
+            print('Datei fehlerhaft-daten beschädigt')
             self.recycle(ak_data)
             return False
         answer = requests.get(f"http://127.0.0.1:8000/data/doesExist/{ak_data['data_type']}/{ak_data['name']}/{ak_data['time']}")
