@@ -1,8 +1,5 @@
-import json
 import requests
 import os
-from models import SensorData, UpdateDataModel
-
 from BenutzerData import *
 # TODO: Wie erhalten wir für uns interessante Informationen von der Verwaltung?
 # TODO: Was sind interessante Daten und welche benötigen wir unter Umständen gar nicht?
@@ -69,8 +66,8 @@ class Animation(object):
 
     def addNamen(self,types,fenster):
         for sensor_typ_index,sensorTyp in enumerate(types):
-            for sensor_name_index,sensorName in enumerate(data):
-                fenster.blit(self.fonts.small_font.render(sensorName, True, self.colors.light_grey), (self.display.getScreenWidth()*0.07,self.display.getScreenHeight()*0.11+self.display.getScreenHeight()*(0.95/len(sensoren_namen))*sensor_typ_index+35*sensor_name_index))
+            for sensor_name_index,sensorName in enumerate(types):
+                fenster.blit(self.fonts.small_font.render(sensorName, True, self.colors.light_grey), (self.display.getScreenWidth()*0.07,self.display.getScreenHeight()*0.11+self.display.getScreenHeight()*(0.95/len(types))*sensor_typ_index+35*sensor_name_index))
 
     def drawDiagramm(self,messdaten,fenster, x_start_pixel, y_start_pixel):
         minMaxData,min,max = getMinundMaxfromData(messdaten)
@@ -93,7 +90,7 @@ def getallDatafromServer():
     data = {}
     for sensor in names:
         typ = list(requests.get(f"http://127.0.0.1:8000/data/typesByName/"+sensor).content)
-        val = list(requests.get(f"http://127.0.0.1:8000/data/getTypeName/"+ typ +"/"+sensor).content)
+        val = list(requests.get(f"http://127.0.0.1:8000/data/getTypeName/"+ typ[0] +"/"+sensor).content)
         data[sensor] = val
         if typ in namen_types.keys():
             namen_types[typ] += [sensor]
