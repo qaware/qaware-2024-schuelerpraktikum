@@ -39,11 +39,11 @@ async def returnDB():
 async def get_latest_db_id():
     latest_content = await get_latest_db_contents()
     latest_id = latest_content["_id"]
-    latest_id_str = str(latest_id)
-    print(" id:", latest_id, type(latest_id), latest_id_str)
+    # latest_id_str = str(latest_id)
+    # print(" id:", latest_id, type(latest_id), latest_id_str)
 
     # return JSONResponse(status_code=status.HTTP_200_OK, content=latest_id_str)
-    return latest_id_str
+    return latest_id
 
 @app.post("/save", response_description="Initial")
 async def saveDB():
@@ -53,7 +53,7 @@ async def saveDB():
     # print(latest_id)
     # latest_id = latest_id_request.content
     print("latest id", latest_id)
-    await db["data"].update_one({"_id": latest_id}, {"$set": jsonable_encoder({"test": "t22"})})
+    await db["data"].update_one({"_id": latest_id}, {"$set": jsonable_encoder({"data": "t22"})})
     print("Updated")
     return JSONResponse(status_code=status.HTTP_200_OK, content="")
 
