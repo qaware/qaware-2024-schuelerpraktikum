@@ -35,24 +35,28 @@ async def returnDB():
     return JSONResponse(status_code=status.HTTP_200_OK, content=latest_data)
 
 
-@app.get("/get-id", response_description="Returned database dict id")
+# @app.get("/get-id", response_description="Returned database dict id")
 async def get_latest_db_id():
     latest_content = await get_latest_db_contents()
     latest_id = latest_content["_id"]
     latest_id_str = str(latest_id)
-    # print("latest id:", latest_id, type(latest_id), latest_id_str)
+    print(" id:", latest_id, type(latest_id), latest_id_str)
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=latest_id_str)
-
+    # return JSONResponse(status_code=status.HTTP_200_OK, content=latest_id_str)
+    return latest_id_str
 
 @app.post("/save", response_description="Initial")
 async def saveDB():
-    print("test")
-    latest_id_request = requests.post("http://127.0.0.1:8000/get-id")
-    # latest_id = await get_latest_db_id()
-    latest_id = latest_id_request.content
+    # print("save db executed")
+    # latest_id_request = requests.get("http://127.0.0.1:8000/get-id")
+    latest_id = await get_latest_db_id()
+    # print(latest_id)
+    # latest_id = latest_id_request.content
     print("latest id", latest_id)
-    # await db["data"].update_data({"_id": latest_id}, {"data": "t22"})
+    await db["data"].update_one({"_id": latest_id}, {"$set": jsonable_encoder({"test": "t22"})})
+    print("Updated")
+    return JSONResponse(status_code=status.HTTP_200_OK, content="")
+
 
 
 @app.get("/append-to-db", response_description="Returned database dict")
