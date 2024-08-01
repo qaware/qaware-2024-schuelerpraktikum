@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 
@@ -21,8 +22,8 @@ class SensorDataModel(BaseModel):
     name: str = Field(...),
     type: str = Field(...),
     pressure: float = Field(...)
-    temperature: float = Field()
-    timestamp: str = Field()
+    temperature: float = Field(...)
+    timestamp: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -102,7 +103,7 @@ def get_current_sensor_db(current_db, sensor_type, sensor_name):
 
 
 @app.post("/append-to-db", response_description="Returned database dict")
-async def append_to_db(new_raw_data):  #: dict[any, any]
+async def append_to_db(new_raw_data: SensorDataModel):
     print("Appending", new_raw_data)
 
     current_db = await get_db()
@@ -130,22 +131,22 @@ async def create_db():
 
 
 if __name__ == '__main__':
-    # data = SensorDataModel(
-    #     name="AA",
-    #     type="AAA",
-    #     pressure=12.2,
-    #     temperature=231.122,
-    #     timestamp="10001"
-    # )
+    data = SensorDataModel(
+        name="AA",
+        type="AAA",
+        pressure=12.2,
+        temperature=231.122,
+        timestamp="10001"
+    )
 
-    data = {
-        "name": "AA",
-        "type": "AAA",
-        "pressure": 12.2,
-        "temperature": 231.122,
-        "timestamp": "10001"
-    }
-    resp1 = requests.post("http://127.0.0.1:8000/append-to-db", data)
+    # data = {
+    #     "name": "AA",
+    #     "type": "AAA",
+    #     "pressure": 12.2,
+    #     "temperature": 231.122,
+    #     "timestamp": "10001"
+    # }
+    resp1 = requests.post("http://127.0.0.1:8000/append-to-db", data.json()) # json.dumps(data), headers={"Content-type": "application/json"}
     print(resp1.status_code, resp1.content)
 
     resp1 = requests.get("http://127.0.0.1:8000/return-db")
