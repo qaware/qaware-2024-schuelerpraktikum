@@ -8,9 +8,9 @@ from fastapi import FastAPI
 app = FastAPI()
 
 
-@app.get("/fetch-input/", response_description="Fetch raw data", response_model=List[dict])
+@app.get("/fetch-inputs/", response_description="Fetch raw data", response_model=List[dict])
 async def fetch_inputs():
-    dict_list= read_files()
+    dict_list = read_files()
     return JSONResponse(status_code=status.HTTP_200_OK, content=dict_list)
 
 
@@ -32,15 +32,12 @@ def read_files():
             data = open(PATH + fileName, "r")
             timestamp = fileName[3:-5]
             data_dict = json.load(data)
-            data_dict["timestamp"] =timestamp
+            data_dict["timestamp"] = timestamp
             dict_list.append(data_dict)
             if fileName > currentNewestFile:
-                currentNewestFile=fileName
+                currentNewestFile = fileName
     newest_file=currentNewestFile
     save = open('../saves/last_saved_file.txt', 'w')
     save.write(newest_file)
-
+    save.close()
     return dict_list
-
-
-read_files()
