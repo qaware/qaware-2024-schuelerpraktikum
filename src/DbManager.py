@@ -36,16 +36,23 @@ async def returnDB():
 
 
 @app.get("/get-id", response_description="Returned database dict id")
-async def returnDB():
+async def get_latest_db_id():
     latest_content = await get_latest_db_contents()
     latest_id = latest_content["_id"]
-    return JSONResponse(status_code=status.HTTP_200_OK, content=latest_id)
+    latest_id_str = str(latest_id)
+    # print("latest id:", latest_id, type(latest_id), latest_id_str)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=latest_id_str)
 
 
 @app.post("/save", response_description="Initial")
 async def saveDB():
-    print("!!")
-    await db["data"].update_data({"data": "t22"})
+    print("test")
+    latest_id_request = requests.post("http://127.0.0.1:8000/get-id")
+    # latest_id = await get_latest_db_id()
+    latest_id = latest_id_request.content
+    print("latest id", latest_id)
+    # await db["data"].update_data({"_id": latest_id}, {"data": "t22"})
 
 
 @app.get("/append-to-db", response_description="Returned database dict")
