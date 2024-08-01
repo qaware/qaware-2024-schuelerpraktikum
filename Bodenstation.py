@@ -66,7 +66,17 @@ class Bodenstation(object):
                 if dif <= 8:
                     print('Warning! Sensor ' + str(pruef[0]) + 'hat wahrscheinlich eine Funktionsstörung!')
 
+    def auslesen(self):
+        print('Fehlerspeicher Auslese:')
+        for nils in self.fehlerspeicher:
+            print(nils + ': ' + str(len(self.fehlerspeicher[nils])) + ' Fehler gespeichert')
+        print('Genauere Informationen zum zeitlichen Auftreten der Fehler:')
+        for nils in self.fehlerspeicher:
+            print(nils + ': ' + str(self.fehlerspeicher[nils]))
+
+
 
 
 b = Bodenstation('data/')
 b.work()
+b.auslesen()
