@@ -5,6 +5,8 @@ import datetime as dt
 
 from bson.json_util import dumps
 
+from cryptography.fernet import Fernet
+
 import motor
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
@@ -19,7 +21,8 @@ os.environ["MONGODB_URL"] = "mongodb://root:password@localhost:27017/?retryWrite
 client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
 db = client.get_database("data")
 
-
+key = "t1Zerro4GwUqPMWbpVBsfnhF2Zkl3FRfXyLzFj33gQk="
+cy = Fernet(key)
 # Groundstation
 @app.get("/data/doesExist/{data_type}/{name}/{time}",
          response_description="Check if Data already exists, returns true if data exists. "
@@ -146,8 +149,9 @@ async def database_backup():
         data_to_save.append(sorted(data_found, key=lambda x: x["time"], reverse=True)[0])
 
     data = dumps(data_to_save)
+    encr_string = cy.encrypt(data.encode())
     savefile = open(f"./dumps/dump_{dt.datetime.isoformat(dt.datetime.now())}.json", "w")
-    savefile.write(data)
+    savefile.write(encr_string.decode())
     savefile.close()
 
 
