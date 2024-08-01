@@ -29,6 +29,11 @@ async def returnDB():
     return JSONResponse(status_code=status.HTTP_200_OK, content=latest_data)
 
 
+@app.post("/save", response_description="Initial")
+async def saveDB(new_db={"data": "AAAAAAAAAA"}):
+    await db["data"].update_data(new_db)
+
+
 @app.get("/append-to-db", response_description="Returned database dict")
 async def appendToDB(new_raw_data):
     current_db = await returnDB()
@@ -54,6 +59,6 @@ async def createDB():
 
 
 if __name__ == '__main__':
-    # resp1 = requests.post("http://127.0.0.1:8000/create")
+    resp1 = requests.post("http://127.0.0.1:8000/save")
     resp1 = requests.get("http://127.0.0.1:8000/return-db")
     print(resp1.status_code, resp1.content)
