@@ -4,14 +4,39 @@ import requests
 import motor
 from fastapi import FastAPI
 from motor import motor_asyncio
+from pydantic import BaseModel, Field
 from starlette import status
 from starlette.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from bson import ObjectId
+from pydantic.class_validators import Optional
 
 app = FastAPI()
 os.environ["MONGODB_URL"] = "mongodb://root:password@localhost:27017/?retryWrites=true&w=majority"
 client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
 db = client.get_database("data")
+
+
+class SensorDataModel(BaseModel):
+    name: str = Field(...),
+    type: str = Field(...),
+    pressure: float = Field(...)
+    temperature: float = Field()
+    timestamp: str = Field()
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "name": "thruster.01b",
+                "type": "thruster",
+                "temperature": 1.23,
+                "pressure": 5.78,
+                "timestamp": 12328
+            }
+        }
 
 
 async def get_latest_db_contents():
@@ -50,14 +75,18 @@ async def get_latest_db_id():
 
 
 @app.post("/save", response_description="Save db")
-async def save_db(new_data):
-    # print("save db executed")
-    latest_id = await get_latest_db_id()
-    print(latest_id)
-    print("latest id", latest_id)
-    await db["data"].update_one({"_id": latest_id}, {"$set": jsonable_encoder({"data": new_data})})
-    print("Updated")
+async def save(new_data):
+    print("save db executed")
+    await save_db(new_data)
     return JSONResponse(status_code=status.HTTP_200_OK, content="")
+
+
+async def save_db(new_data):
+    latest_id = await get_latest_db_id()
+    # print(latest_id)
+    # print("latest id", latest_id)
+    await db["data"].update_one({"_id": latest_id}, {"$set": jsonable_encoder({"data": new_data})})
+    # print("Updated")
 
 
 def get_current_sensor_db(current_db, sensor_type, sensor_name):
@@ -73,16 +102,9 @@ def get_current_sensor_db(current_db, sensor_type, sensor_name):
 
 
 @app.post("/append-to-db", response_description="Returned database dict")
-async def append_to_db():
-    new_raw_data = {
-        "name": "sa",
-        "type": "dad",
-        "pressure": 12,
-        "temperature": 231,
-        "timestamp": 10001
-    }
+async def append_to_db(new_raw_data):  #: dict[any, any]
+    print("Appending", new_raw_data)
 
-    print("Appending")
     current_db = await get_db()
     print("Mapping", current_db)
 
@@ -96,7 +118,7 @@ async def append_to_db():
 
     current_sensor_db.append(new_sensor_entry)
 
-    await save_db(current_db)
+    await save(current_db)
 
 
 @app.post("/create", response_description="Initial")
@@ -108,6 +130,22 @@ async def create_db():
 
 
 if __name__ == '__main__':
-    resp1 = requests.post("http://127.0.0.1:8000/append-to-db")
-    resp1 = requests.get("http://127.0.0.1:8000/return-db")
+    # data = SensorDataModel(
+    #     name="AA",
+    #     type="AAA",
+    #     pressure=12.2,
+    #     temperature=231.122,
+    #     timestamp="10001"
+    # )
+
+    data = {
+        "name": "AA",
+        "type": "AAA",
+        "pressure": 12.2,
+        "temperature": 231.122,
+        "timestamp": "10001"
+    }
+    resp1 = requests.post("http://127.0.0.1:8000/append-to-db", data)
     print(resp1.status_code, resp1.content)
+
+    resp1 = requests.get("http://127.0.0.1:8000/return-db")
