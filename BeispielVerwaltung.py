@@ -1,6 +1,9 @@
 import os
 from typing import List
 
+from scheduler import Scheduler
+import datetime as dt
+
 import motor
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
@@ -114,3 +117,12 @@ def filter_by_time(time: str, data: List):
 
 async def find_data(args: dict[str, str]):
     return await db["data"].find(args).to_list(1000)
+
+schedule = Scheduler()
+
+
+async def database_backup():
+    os.system(f"mongodump --uri=\"mongodb://root:password@localhost:27017/?retryWrites=true&w=majority\" "
+              f"--db=\"data\" --out=\"./dump/{dt.datetime.isoformat(dt.datetime.now())}")
+
+schedule.cyclic(dt.timedelta(minutes=10), database_backup)
