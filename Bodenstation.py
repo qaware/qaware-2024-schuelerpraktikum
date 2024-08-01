@@ -93,9 +93,12 @@ class Bodenstation(object):
         if len(pruef) > 0:
             l = self.fehlerspeicher[pruef[0]]
             if len(l) >= 3:
-                dif = (l[0]-l[1])+(l[1]-l[2])
-                if dif <= 8:
-                    print('Warning! Sensor ' + str(pruef[0]) + 'hat wahrscheinlich eine Funktionsstörung!')
+                try:
+                    dif = (l[0]-l[1])+(l[1]-l[2])
+                    if dif <= 8:
+                        print('Warning! Sensor ' + str(pruef[0]) + 'hat wahrscheinlich eine Funktionsstörung!')
+                except TypeError:
+                    pass
 
     def auslesen(self):
         print('Fehlerspeicher Auslese:')
