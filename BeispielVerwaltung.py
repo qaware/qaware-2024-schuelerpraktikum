@@ -23,6 +23,8 @@ db = client.get_database("data")
 
 key = "t1Zerro4GwUqPMWbpVBsfnhF2Zkl3FRfXyLzFj33gQk="
 cy = Fernet(key)
+
+
 # Groundstation
 @app.get("/data/doesExist/{data_type}/{name}/{time}",
          response_description="Check if Data already exists, returns true if data exists. "
@@ -150,7 +152,7 @@ async def database_backup():
 
     data = dumps(data_to_save)
     encr_string = cy.encrypt(data.encode())
-    savefile = open(f"./dumps/dump_{dt.datetime.isoformat(dt.datetime.now())}.json", "w")
+    savefile = open(f"./dumps/dump_{dt.datetime.isoformat(dt.datetime.now())}.json.encr", "w")
     savefile.write(encr_string.decode())
     savefile.close()
 
