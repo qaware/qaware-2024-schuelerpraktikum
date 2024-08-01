@@ -1,3 +1,4 @@
+import datetime
 import os
 from typing import List
 
@@ -114,6 +115,16 @@ async def types_by_name(name: str):
 async def names_by_type(data_type: str):
     found_types = await db["data"].distinct("name", filter={"data_type": data_type})
     return JSONResponse(content=found_types)
+
+
+@app.get("/dump/", response_model=str, response_description="return the latest dump")
+async def dump():
+    arr = os.listdir("dumps/")
+    dates = []
+    for i in arr:
+        dates.append(datetime.datetime.fromisoformat(i[5:-10]))
+    dump = open(f"./dumps/dump_{datetime.datetime.isoformat(sorted(dates, reverse=True)[0])}.json.encr").read()
+    return JSONResponse(content=dump)
 
 
 def filter_by_time(time: str, data: List):
