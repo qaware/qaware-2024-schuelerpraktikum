@@ -1,5 +1,9 @@
 import requests
 import os
+import codecs
+
+import json
+
 from BenutzerData import *
 # TODO: Wie erhalten wir für uns interessante Informationen von der Verwaltung?
 # TODO: Was sind interessante Daten und welche benötigen wir unter Umständen gar nicht?
@@ -80,22 +84,22 @@ class Animation(object):
         for messung in minMaxData:
             faktorWidth = pixelWidth/minMaxData[messung]["anzahl"]
             for value_index in range(len(messdaten[messung])-1):
-                py.draw.line(fenster,self.colors.black, (x_start_pixel+faktorWidth*value_index, y_start_pixel+faktorHeight*(messdaten[messung][value_index].value-min)),(x_start_pixel+faktorWidth*(value_index+1),y_start_pixel+faktorHeight*(messdaten[messung][value_index+1].value-min)))
-
+                py.draw.line(fenster,self.colors.black, (x_start_pixel+faktorWidth*value_index, y_start_pixel+faktorHeight*(messdaten[messung][value_index]['value']-min)),(x_start_pixel+faktorWidth*(value_index+1),y_start_pixel+faktorHeight*(messdaten[messung][value_index+1]['value']-min)))
 
 def getallDatafromServer():
-    types = list(requests.get(f"http://127.0.0.1:8000/data/allTypes/").content)
-    names = list(requests.get(f"http://127.0.0.1:8000/data/allNames/").content)
+    types = json.loads(requests.get(f"http://127.0.0.1:8000/data/allTypes/").content)
+    names = json.loads(requests.get(f"http://127.0.0.1:8000/data/allNames/").content)
     namen_types = {}
     data = {}
     for sensor in names:
-        typ = list(requests.get(f"http://127.0.0.1:8000/data/typesByName/"+sensor).content)
-        val = list(requests.get(f"http://127.0.0.1:8000/data/getTypeName/"+ typ[0] +"/"+sensor).content)
+        typ = json.loads(requests.get(f"http://127.0.0.1:8000/data/typesByName/"+sensor).content)
+        val = json.loads(requests.get(f"http://127.0.0.1:8000/data/getTypeName/"+ typ[0]+"/"+sensor).content)
         data[sensor] = val
-        if typ in namen_types.keys():
-            namen_types[typ] += [sensor]
+        if typ[0] in namen_types.keys():
+            namen_types[typ[0]] += [sensor]
         else:
-            namen_types = [sensor]
+            namen_types[typ[0]] = [sensor]
+    print(types,data,namen_types)
     return types, data, namen_types
 """
 def getSensorenNamen(data):
@@ -132,13 +136,20 @@ def getMinundMaxfromData(messdaten):
         anzahlMessungen = 0
         for messdata in messdaten[sensor]:
             anzahlMessungen += 1
-            if messdata.value > max:
-                max = messdata.value
-            if messdata.value < min:
-                min = messdata.value
-            if messdata.value > gesMax:
-                gesMax = messdata.value
-            if messdata.value < gesMin:
-                gesMin = messdata.value
+            if messdata['value'] > max:
+                max = messdata['value']
+            if messdata['value'] < min:
+                min = messdata['value']
+            if messdata['value'] > gesMax:
+                gesMax = messdata['value']
+            if messdata['value'] < gesMin:
+                gesMin = messdata['value']
         minMaxData[sensor] = {"min": min, "max": max, "anzahl": anzahlMessungen}
     return minMaxData, gesMin, gesMax
+
+py.init()
+display = Screen()
+colors = Colors()
+fonts = Fonts()
+animation = Animation(display,colors,fonts)
+animation.sensorKontrollScreen_Start_dynamisch()
