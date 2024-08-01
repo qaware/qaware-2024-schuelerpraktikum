@@ -40,7 +40,7 @@ async def create_data(data: DataModel):
 
 @app.get("/data/", response_description="List All Data", response_model=List[DataModel])
 async def list_data():
-    data = await db["data"].find().to_list(1000)
+    data = await db["data"].find().to_list(1)
     return JSONResponse(status_code=status.HTTP_200_OK, content=data)
 
 

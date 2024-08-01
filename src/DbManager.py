@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from motor import motor_asyncio
 from starlette import status
 from starlette.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 
 app = FastAPI()
 os.environ["MONGODB_URL"] = "mongodb://root:password@localhost:27017/?retryWrites=true&w=majority"
@@ -15,8 +16,16 @@ db = client.get_database("data")
 
 @app.get("/return-db", response_description="Returned database dict")
 async def returnDB():
-    data = await db["data"].find().to_list(1000)
-    return JSONResponse(status_code=status.HTTP_200_OK, content=data)
+    data = await db["data"].find().to_list(1) # TODO: data structure unklar
+    latest_data = None
+    # db is created in appendToDb if empty
+    if len(data) == 0:
+        print("Empty db")
+        latest_data = {}
+    else:
+        latest_data = data[-1]
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=latest_data)
 
 
 @app.get("/return-db", response_description="Returned database dict")
@@ -32,18 +41,19 @@ async def appendToDB(new_raw_data):
 
     current_sensor_db.append(new_sensor_entry)
 
-    await save_db(current_db)
+    await saveDB(current_db)
 
-@app.put("/save", response_description="Test save")
-async def save_db():
-    test = ["test"]
-    await db["data"].update(test)
-    return JSONResponse(status_code=status.HTTP_200_OK)
+
+@app.post("/create", response_description="Initial")
+async def createDB():
+    initial_data = {"data": {}}
+    json = jsonable_encoder(initial_data)
+    await db["data"].insert_one(json)
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content="")
 
 
 
 if __name__ == '__main__':
-    resp1 = requests.post("http://127.0.0.1:8000/save")
-    print(resp1)
-    resp = requests.get("http://127.0.0.1:8000/returndb")
-    print(resp.status_code, resp.content)
+    # resp1 = requests.post("http://127.0.0.1:8000/create")
+    resp1 = requests.get("http://127.0.0.1:8000/return-db")
+    print(resp1.status_code, resp1.content)
