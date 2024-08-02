@@ -9,14 +9,17 @@ class Animation(object):
         self.colors = colors
         self.fonts = fonts
         self.color_name = dict()
+        self.buttonpressed = False
+        self.buttontyp = ""
 
-    def sensorKnotrollscreen_Start(self, fenster):
+    def sensorKnotrollscreen_Start(self, fenster, buttonakt = False):
         data, namen_types= getallDatafromServer()
         types = list(namen_types.keys())
         # statische Objekte werden gezeichnet
         fenster.blit(py.image.load(os.path.join('images', 'space.jpg')),(0,0))
         # dynamischer Hintergrund für die Sensorentypen
         for x in range(len(types)):
+            self.create_button(self.display.getScreenWidth()*0.05,self.display.getScreenHeight()*0.05+self.display.getScreenHeight()*(0.95/len(types))*x,self.display.getScreenWidth()//6.67,self.display.getScreenHeight()*(0.85/len(types)),types[x])
             py.draw.rect(fenster,self.colors.white,[self.display.getScreenWidth()*0.05,self.display.getScreenHeight()*0.05+self.display.getScreenHeight()*(0.95/len(types))*x, self.display.getScreenWidth()//6.67,self.display.getScreenHeight()*(0.85/len(types))],border_radius=10)
 
         # Hintergrund für die Diagramme
@@ -30,11 +33,14 @@ class Animation(object):
         # Diagramm rechts
         py.draw.line(fenster,self.colors.black,(self.display.getScreenWidth()*0.62,self.display.getScreenHeight()*0.37),(self.display.getScreenWidth()*0.62,self.display.getScreenHeight()*0.92))
         py.draw.line(fenster,self.colors.black,(self.display.getScreenWidth()*0.62,self.display.getScreenHeight()*0.92),(self.display.getScreenWidth()*0.93,self.display.getScreenHeight()*0.92))
-
         self.addHeadlines(types,fenster)
         self.addNamen(namen_types,fenster)
-        self.drawDiagramm(historicalData(data),fenster,self.display.getScreenWidth()*0.62,self.display.getScreenHeight()*0.92)
-        self.drawDiagramm(lastData(data), fenster,self.display.getScreenWidth()*0.24,self.display.getScreenHeight()*0.62)
+        if buttonakt == False:
+            self.drawDiagramm(historicalData(data),fenster,self.display.getScreenWidth()*0.62,self.display.getScreenHeight()*0.92)
+            self.drawDiagramm(lastData(data), fenster,self.display.getScreenWidth()*0.24,self.display.getScreenHeight()*0.62)
+        else:
+            self.drawDiagramm(historicalData(data,self.buttontyp),fenster,self.display.getScreenWidth()*0.62,self.display.getScreenHeight()*0.92)
+            self.drawDiagramm(lastData(data,self.buttontyp), fenster,self.display.getScreenWidth()*0.24,self.display.getScreenHeight()*0.62)
 
     def sensorKontrollScreen_Start_dynamisch(self):
         fenster = py.display.set_mode((self.display.getScreenWidth(),self.display.getScreenHeight()))
@@ -50,6 +56,30 @@ class Animation(object):
                 # Beenden bei [ESC] oder [X]
                 if event.type == py.QUIT or (event.type == py.KEYDOWN and event.key == py.K_ESCAPE):
                     py.quit()
+                if self.buttonpressed == True:
+                    self.sensorKontrollScreen_Data()
+            # Display aktualisieren
+            py.display.flip()
+            clock.tick(self.display.getFPS())
+
+    def sensorKontrollScreen_Data(self):
+        fenster = py.display.set_mode((self.display.getScreenWidth(),self.display.getScreenHeight()))
+        py.display.set_caption("Satellitenkontrollprogramm")
+        clock = py.time.Clock()
+        self.buttonpressed = False
+        self.sensorKnotrollscreen_Start(fenster)
+        counter = 0
+        print(self.buttontyp)
+        while True:
+            counter += 1
+            if counter%30 == 0:
+                self.sensorKnotrollscreen_Start(fenster,True)
+            for event in py.event.get():
+                # Beenden bei [ESC] oder [X]
+                if event.type == py.QUIT or (event.type == py.KEYDOWN and event.key == py.K_ESCAPE):
+                    py.quit()
+                if self.buttonpressed == True:
+                    self.sensorKontrollScreen_Data()
             # Display aktualisieren
             py.display.flip()
             clock.tick(self.display.getFPS())
@@ -85,40 +115,54 @@ class Animation(object):
             if len(points) > 1:
                 py.draw.aalines(fenster,self.color_name[messung], False, points)
 
-def lastData(messdaten):
+    def button(self,name):
+        self.buttonpressed = True
+        self.buttontyp = name
+        #self.create_button(self.welt.display.display_breite*0.77,self.welt.display.display_hoehe*0.39,self.welt.display.display_breite*0.2,self.welt.display.display_hoehe*0.08,self.weltGUIs.brown,self.weltGUIs.grey_brown)
+
+    def create_button(self,x,y,breite,hoehe,name):
+        maus = py.mouse.get_pos()
+        # eine Maus kann zwischen 3 oder 5 Tasten haben. Wenn man nur 3 auswählt, dann werden die seitenTasten nicht funktionieren
+        klick = py.mouse.get_pressed(5)
+        if x + breite > maus[0] > x and y + hoehe > maus[1] > y:
+            if klick[0] == 1:
+                self.button(name)
+
+def lastData(messdaten,name = False):
     anzahlVonMessdaten = 20
     neueMessdaten = {}
     for sensor in messdaten:
-        if len(messdaten[sensor]) < anzahlVonMessdaten:
-            neueMessdaten[sensor] = messdaten[sensor]
-        else:
-            neueMessdaten[sensor] = messdaten[sensor][-20:]
-            print(messdaten[sensor][-20:])
+        if name == False or messdaten[sensor][0]["data_type"] == name:
+            if len(messdaten[sensor]) < anzahlVonMessdaten:
+                neueMessdaten[sensor] = messdaten[sensor]
+            else:
+                neueMessdaten[sensor] = messdaten[sensor][-20:]
     return neueMessdaten
 
-def historicalData(messdaten):
+def historicalData(messdaten, name = False):
     anzahlVonDaten = 30
     neueMessdaten = {}
     for sensor in messdaten:
-        if len(messdaten[sensor]) <= 30:
-            neueMessdaten[sensor] = messdaten[sensor]
-        else:
-            faktor = len(messdaten[sensor])//anzahlVonDaten
-            if faktor == 1:
+        if name == False or messdaten[sensor][0]["data_type"] == name:
+            if len(messdaten[sensor]) <= 30:
                 neueMessdaten[sensor] = messdaten[sensor]
             else:
-                counter = 0
-                durchschnitt = 0
-                neueMessdaten[sensor] = []
-                for messung in messdaten[sensor]:
-                    durchschnitt += messung["value"]
-                    counter += 1
-                    if counter == faktor:
-                        neueMessdaten[sensor] += [{"value":durchschnitt//faktor}]
-                        durchschnitt = 0
-                        counter = 0
-                if durchschnitt != 0:
-                    neueMessdaten[sensor] += [{"value":durchschnitt//counter}]
+                faktor = len(messdaten[sensor])//anzahlVonDaten
+                if faktor == 1:
+                    neueMessdaten[sensor] = messdaten[sensor]
+                else:
+                    counter = 0
+                    durchschnitt = 0
+                    neueMessdaten[sensor] = []
+                    for messung in messdaten[sensor]:
+                        durchschnitt += messung["value"]
+                        counter += 1
+                        if counter == faktor:
+                            neueMessdaten[sensor] += [{"value":durchschnitt//faktor}]
+                            durchschnitt = 0
+                            counter = 0
+                    if durchschnitt != 0:
+                        neueMessdaten[sensor] += [{"value":durchschnitt//counter}]
     return neueMessdaten
 
 

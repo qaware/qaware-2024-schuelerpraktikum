@@ -37,9 +37,9 @@ class Colors(object):
         self.red = (255,0,0)
         self.dark_red = (200, 0, 0)
         self.silver = (120,120,120)
-        self.colorPlatten = [[self.black, self.grey, self.light_grey, self.grey_dark, self.silver],
-                             [self.green_normal, self.light_green, self.sand],
-                             [self.gold, self.sand, self.sand_light],
+        self.colorPlatten = [[self.black, self.grey, self.light_grey, self.grey_dark, self.silver,(128,128,128)],
+                             [self.green_normal, self.light_green, (0,51,0),(0,102,0),(0,255,0),(0,153,73)],
+                             [self.gold, self.sand, self.sand_light,(255,255,0),(102,102,0),(255,255,102)],
                              [self.dark_red, self.red]]
 
 
