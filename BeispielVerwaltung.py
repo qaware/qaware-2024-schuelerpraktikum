@@ -52,7 +52,6 @@ async def get_by_name(name: str):
          response_model=List[SensorData])
 async def get_by_type_name(data_type: str, name: str):
     found_data = await find_data({"data_type": data_type, "name": name})
-    print(found_data)
     return JSONResponse(content=found_data)
 
 
