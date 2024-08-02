@@ -67,11 +67,11 @@ async def save_db(new_data):
 def get_current_sensor_db(current_db, sensor_type, sensor_name):
     if sensor_type not in current_db:
         current_db[sensor_type] = {}
-        print("Type doesn't exist")
+        print("Type doesn't exist, creating", sensor_type)
 
     if sensor_name not in current_db[sensor_type]:
         current_db[sensor_type][sensor_name] = []
-        print("Sensor doesn't exist")
+        print("Sensor doesn't exist, creating", sensor_name)
 
     current_sensor_db = current_db[sensor_type][sensor_name]
 
