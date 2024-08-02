@@ -11,33 +11,17 @@ from starlette.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from bson import ObjectId
 from pydantic.class_validators import Optional
+from ModelHandling import ModelMapper
+from ModelHandling import SensorDataModel
 
 app = FastAPI()
+mapper = ModelMapper()
 os.environ["MONGODB_URL"] = "mongodb://root:password@localhost:27017/?retryWrites=true&w=majority"
 client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
 db = client.get_database("data")
 
 
-class SensorDataModel(BaseModel):
-    name: str = Field(...),
-    type: str = Field(...),
-    pressure: float = Field(...)
-    temperature: float = Field(...)
-    timestamp: str = Field(...)
 
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "name": "thruster.01b",
-                "type": "thruster",
-                "temperature": 1.23,
-                "pressure": 5.78,
-                "timestamp": 12328
-            }
-        }
 
 
 async def get_latest_db_contents():
@@ -131,22 +115,20 @@ async def create_db():
 
 
 if __name__ == '__main__':
-    data = SensorDataModel(
-        name="AA",
-        type="AAA",
-        pressure=12.2,
-        temperature=231.122,
-        timestamp="10001"
-    )
+    data = {
+        "name": "AA",
+        "type": "AAA",
+        "pressure": 12.2,
+        "temperature": 231.122,
+        "timestamp": "10001"
+    }
 
-    # data = {
-    #     "name": "AA",
-    #     "type": "AAA",
-    #     "pressure": 12.2,
-    #     "temperature": 231.122,
-    #     "timestamp": "10001"
-    # }
-    resp1 = requests.post("http://127.0.0.1:8000/append-to-db", data.json()) # json.dumps(data), headers={"Content-type": "application/json"}
-    print(resp1.status_code, resp1.content)
+    data = mapper.dict_to_model(data)
+    print(data)
 
-    resp1 = requests.get("http://127.0.0.1:8000/return-db")
+    # resp1 = requests.post("http://127.0.0.1:8000/append-to-db", data.json()) # json.dumps(data), headers={"Content-type": "application/json"}
+    # print(resp1.status_code, resp1.content)
+    #
+    # resp1 = requests.get("http://127.0.0.1:8000/return-db")
+
+    # print(resp1.status_code, resp1.content)
