@@ -33,6 +33,15 @@ class DataGenerator:
 
     def __init__(self):
         """Constructor"""
+        self.old_value = {'thruster_1.a': None,
+                          'thruster_1.b': None,
+                          'thruster_1.c': None,
+                          'oxygen_tank_1': None,
+                          'oxygen_tank_2': None,
+                          'hydrogen_tank_1': None,
+                          'panel_1': None,
+                          'panel_2': None,
+                          'panel_3': None}
         self.available_sensors: list[SensorKey] = [
             SensorKey(name="thruster_1.a", type="thruster"),
             SensorKey(name="thruster_1.b", type="thruster"),
