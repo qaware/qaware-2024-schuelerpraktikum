@@ -1,7 +1,5 @@
 import requests
 import os
-import codecs
-
 import json
 
 from BenutzerData import *
@@ -15,10 +13,11 @@ class Animation(object):
         self.display = display
         self.colors = colors
         self.fonts = fonts
+        self.color_name = dict()
 
     def sensorKnotrollscreen_Start(self, fenster):
-        types, data, namen_types= getallDatafromServer()
-
+        data, namen_types= getallDatafromServer()
+        types = list(namen_types.keys())
         # statische Objekte werden gezeichnet
         fenster.blit(py.image.load(os.path.join('images', 'space.jpg')),(0,0))
         # dynamischer Hintergrund für die Sensorentypen
@@ -30,7 +29,6 @@ class Animation(object):
         py.draw.rect(fenster, self.colors.white, [self.display.getScreenWidth()*0.6, self.display.getScreenHeight()*0.35,self.display.getScreenWidth()*0.35, (self.display.getScreenHeight()*0.61)], border_radius=10)
 
         # die x und y Achsen
-
         # Diagramm links
         py.draw.line(fenster,self.colors.black,(self.display.getScreenWidth()*0.24,self.display.getScreenHeight()*0.07),(self.display.getScreenWidth()*0.24,self.display.getScreenHeight()*0.62))
         py.draw.line(fenster,self.colors.black,(self.display.getScreenWidth()*0.24,self.display.getScreenHeight()*0.62),(self.display.getScreenWidth()*0.56,self.display.getScreenHeight()*0.62))
@@ -40,7 +38,8 @@ class Animation(object):
 
         self.addHeadlines(types,fenster)
         self.addNamen(namen_types,fenster)
-        self.drawDiagramm(data,fenster,self.display.getScreenWidth()*0.62,self.display.getScreenHeight()*0.37)
+        self.drawDiagramm(historicalData(data),fenster,self.display.getScreenWidth()*0.62,self.display.getScreenHeight()*0.92)
+        self.drawDiagramm(lastData(data), fenster,self.display.getScreenWidth()*0.24,self.display.getScreenHeight()*0.62)
 
     def sensorKontrollScreen_Start_dynamisch(self):
         fenster = py.display.set_mode((self.display.getScreenWidth(),self.display.getScreenHeight()))
@@ -50,14 +49,12 @@ class Animation(object):
         counter = 0
         while True:
             counter += 1
-            if counter%60 == 0:
+            if counter%120 == 0:
                 self.sensorKnotrollscreen_Start(fenster)
             for event in py.event.get():
-                # TODO schließen des Programms bei Betätigung von X
                 # Beenden bei [ESC] oder [X]
                 if event.type == py.QUIT or (event.type == py.KEYDOWN and event.key == py.K_ESCAPE):
                     py.quit()
-
             # Display aktualisieren
             py.display.flip()
             clock.tick(self.display.getFPS())
@@ -66,12 +63,16 @@ class Animation(object):
         fenster.blit(self.fonts.font.render("alle historische Daten", True, self.colors.light_grey), (self.display.getScreenWidth()*0.61,self.display.getScreenHeight()*0.25))
         fenster.blit(self.fonts.font.render("letzten Daten", True, self.colors.light_grey), (self.display.getScreenWidth()*0.23,self.display.getScreenHeight()*0.67))
         for index,sensorArt in enumerate(data_typen):
+            if sensorArt not in self.color_name:
+                self.color_name[sensorArt] = index
             fenster.blit(self.fonts.small_font.render(sensorArt, True, self.colors.blackish), (self.display.getScreenWidth()*0.07,self.display.getScreenHeight()*0.06+self.display.getScreenHeight()*(0.95/len(data_typen))*index))
 
     def addNamen(self,types,fenster):
         for sensor_typ_index,sensorTyp in enumerate(types):
-            for sensor_name_index,sensorName in enumerate(types):
-                fenster.blit(self.fonts.small_font.render(sensorName, True, self.colors.light_grey), (self.display.getScreenWidth()*0.07,self.display.getScreenHeight()*0.11+self.display.getScreenHeight()*(0.95/len(types))*sensor_typ_index+35*sensor_name_index))
+            for sensor_name_index,sensorName in enumerate(types[sensorTyp]):
+                if sensorName not in self.color_name:
+                    self.color_name[sensorName] = self.colors.colorPlatten[self.color_name[sensorTyp]][sensor_name_index]
+                fenster.blit(self.fonts.small_font.render(sensorName, True, self.color_name[sensorName]), (self.display.getScreenWidth()*0.055,self.display.getScreenHeight()*0.11+self.display.getScreenHeight()*(0.95/len(types))*sensor_typ_index+35*sensor_name_index))
 
     def drawDiagramm(self,messdaten,fenster, x_start_pixel, y_start_pixel):
         minMaxData,min,max = getMinundMaxfromData(messdaten)
@@ -83,11 +84,51 @@ class Animation(object):
             faktorHeight = 2
         for messung in minMaxData:
             faktorWidth = pixelWidth/minMaxData[messung]["anzahl"]
-            for value_index in range(len(messdaten[messung])-1):
-                py.draw.line(fenster,self.colors.black, (x_start_pixel+faktorWidth*value_index, y_start_pixel+faktorHeight*(messdaten[messung][value_index]['value']-min)),(x_start_pixel+faktorWidth*(value_index+1),y_start_pixel+faktorHeight*(messdaten[messung][value_index+1]['value']-min)))
+            points = []
+            for value_index in range(len(messdaten[messung])):
+                points += [(x_start_pixel+faktorWidth*value_index, y_start_pixel-(faktorHeight*(messdaten[messung][value_index]['value']-min)))]
+            if len(points) > 1:
+                py.draw.aalines(fenster,self.color_name[messung], False, points)
+
+def lastData(messdaten):
+    anzahlVonMessdaten = 20
+    neueMessdaten = {}
+    for sensor in messdaten:
+        if len(messdaten[sensor]) < anzahlVonMessdaten:
+            neueMessdaten[sensor] = messdaten[sensor]
+        else:
+            neueMessdaten[sensor] = messdaten[sensor][-20:]
+            print(messdaten[sensor][-20:])
+    return neueMessdaten
+
+def historicalData(messdaten):
+    anzahlVonDaten = 30
+    neueMessdaten = {}
+    for sensor in messdaten:
+        if len(messdaten[sensor]) <= 30:
+            neueMessdaten[sensor] = messdaten[sensor]
+        else:
+            faktor = len(messdaten[sensor])//anzahlVonDaten
+            if faktor == 1:
+                neueMessdaten[sensor] = messdaten[sensor]
+            else:
+                counter = 0
+                durchschnitt = 0
+                neueMessdaten[sensor] = []
+                for messung in messdaten[sensor]:
+                    durchschnitt += messung["value"]
+                    counter += 1
+                    if counter == faktor:
+                        neueMessdaten[sensor] += [{"value":durchschnitt//faktor}]
+                        durchschnitt = 0
+                        counter = 0
+                if durchschnitt != 0:
+                    neueMessdaten[sensor] += [{"value":durchschnitt//counter}]
+    return neueMessdaten
+
 
 def getallDatafromServer():
-    types = json.loads(requests.get(f"http://127.0.0.1:8000/data/allTypes/").content)
+    #types = json.loads(requests.get(f"http://127.0.0.1:8000/data/allTypes/").content)
     names = json.loads(requests.get(f"http://127.0.0.1:8000/data/allNames/").content)
     namen_types = {}
     data = {}
@@ -99,32 +140,7 @@ def getallDatafromServer():
             namen_types[typ[0]] += [sensor]
         else:
             namen_types[typ[0]] = [sensor]
-    print(types,data,namen_types)
-    return types, data, namen_types
-"""
-def getSensorenNamen(data):
-    sensoren_namen = {}
-    for messung in data:
-        if data[messung]["data_type"] not in sensoren_namen.keys():
-            sensoren_namen[data[messung]["data_type"]] = [data[messung]["name"]]
-        elif data[messung]["name"] not in sensoren_namen[data[messung]["data_type"]]:
-            sensoren_namen[data[messung]["data_type"]] += [data[messung]["name"]]
-    return sensoren_namen"""
-"""
-def getMessdatenvonSensor(data,name=0):
-    messdaten = {}
-    for messung in data:
-        if name == 0:
-            if data[messung]["name"] not in messdaten.keys():
-                messdaten[data[messung]["name"]] = [data[messung]["val"]]
-            else:
-                messdaten[data[messung]["name"]] += [data[messung]["val"]]
-        else:
-            if messung == name and data[messung] not in messdaten.keys():
-                messdaten[data[messung]["name"]] = [data[messung]["val"]]
-            else:
-                messdaten[data[messung]["name"]] += [data[messung]["val"]]
-    return messdaten"""
+    return data, namen_types
 
 def getMinundMaxfromData(messdaten):
     minMaxData = {}

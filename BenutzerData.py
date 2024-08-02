@@ -2,8 +2,8 @@ import pygame as py
 
 class Screen(object):
     def __init__(self):
-        self.screen_width = 1300
-        self.screen_height = 700
+        self.screen_width = 1500
+        self.screen_height = 820
         self.fps = 60
 
     def getScreenHeight(self):
@@ -37,6 +37,11 @@ class Colors(object):
         self.red = (255,0,0)
         self.dark_red = (200, 0, 0)
         self.silver = (120,120,120)
+        self.colorPlatten = [[self.black, self.grey, self.light_grey,self.grey_dark, self.silver],
+                             [self.green_normal, self.light_green],
+                             [self.gold, self.sand, self.sand_light],
+                             [self.dark_red, self.red]]
+
 
 class Fonts(object):
     def __init__(self):
