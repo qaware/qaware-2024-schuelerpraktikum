@@ -6,23 +6,22 @@ from pydantic.main import create_model
 
 class Controller():
 
-    def fetch_inputs(cls):
-        # TODO alle 0,5s den Reader abfragen
+    def fetch_inputs_and_transport(self):
+        # alle 0.5s den Reader abfragen
 
         while True:
-            print("fetch_inputs")
-            answer = requests.get("http://127.0.0.1:8000/fetch-inputs")
+            print("fetching inputs")
+            answer = requests.get("http://127.0.0.1:8001/fetch-inputs")
             print(answer)
+            print(answer.content)
+            self.transport(answer)
             sleep(0.5)
-            print("waited 0,5 seconds")
-
-            cls.transport(answer)
+            print("waited 0.5 seconds")
 
     def transport(self, reader_data):
         print("transporting data")
-
-        answer = requests.post("http://127.0.0.1:8000/append-to-db", reader_data)
-        print(answer)
+        for sensor_input in reader_data:
+            print(requests.post("http://127.0.0.1:8002/append-to-db", sensor_input))
 
     def update_view(self):
         db_response = requests.get("http://127.0.0.1:8000/return-db")
@@ -46,7 +45,7 @@ class Controller():
 if __name__ == '__main__':
     controller = Controller()  # wird umbenannt
 
-    reader_thread = threading.Thread(target=controller.fetch_inputs())
+    reader_thread = threading.Thread(target=controller.fetch_inputs_and_transport())
     reader_thread.start()
     output_thread = threading.Thread(target=controller.trigger_view_updates())
     output_thread.start()
