@@ -1,16 +1,11 @@
-import json
 import os
-import requests
 
 import motor
 from fastapi import FastAPI
 from motor import motor_asyncio
-from pydantic import BaseModel, Field
 from starlette import status
 from starlette.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from bson import ObjectId
-from pydantic.class_validators import Optional
 from src.ModelHandling import ModelMapper
 from src.ModelHandling import SensorDataModel
 
@@ -123,20 +118,19 @@ async def create_db():
     await db["data"].insert_one(json)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content="")
 
-
 # if __name__ == '__main__':
-    # Example input
-    # data = {
-    #     "name": "AA",
-    #     "type": "AA2224",
-    #     "pressure": 12.5,
-    #     "temperature": 0,
-    #     "timestamp": "10001236"
-    # }
-    #
-    # data = mapper.dict_to_model(data)
+# Example input
+# data = {
+#     "name": "AA",
+#     "type": "AA2224",
+#     "pressure": 12.5,
+#     "temperature": 0,
+#     "timestamp": "10001236"
+# }
+#
+# data = mapper.dict_to_model(data)
 
-    # resp1 = requests.post("http://127.0.0.1:8000/append-to-db", data.json())
-    # resp1 = requests.get("http://127.0.0.1:8000/return-db")
+# resp1 = requests.post("http://127.0.0.1:8000/append-to-db", data.json())
+# resp1 = requests.get("http://127.0.0.1:8000/return-db")
 
-    # print(resp1.status_code, resp1.content)
+# print(resp1.status_code, resp1.content)
