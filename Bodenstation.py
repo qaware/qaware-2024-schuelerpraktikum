@@ -51,7 +51,11 @@ class Bodenstation(object):
         elif not 'name' in l or not 'time' in l:
             print('Datei fehlerhaft-unvollständig-b')
             if 'name' in l and not ak_data['name'] == None:
-                self.fehlerspeicher[ak_data['name']].append('unkown')
+                try:
+                    self.fehlerspeicher[ak_data['name']].append('unkown')
+                except:
+                    self.fehlerspeicher[ak_data['name']] = []
+                    self.fehlerspeicher[ak_data['name']].append('unkown')
             elif 'time' in l and not ak_data['time'] == None:
                 self.fehlerspeicher['unkown'].append(ak_data['time'])
             else:
