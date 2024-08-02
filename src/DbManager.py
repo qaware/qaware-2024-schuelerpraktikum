@@ -21,9 +21,6 @@ client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
 db = client.get_database("data")
 
 
-
-
-
 async def get_latest_db_contents():
     db_contents = await db["data"].find().to_list(1)  # [{'_id': ObjectId('66ab3cfc7e7a9c72fbac78c8'), 'data': {}}]
 
@@ -53,12 +50,10 @@ async def get_db():
     return latest_data
 
 
-# @app.get("/get-id", response_description="Returned database dict id")
 async def get_latest_db_id():
     latest_content = await get_latest_db_contents()
     latest_id = latest_content["_id"]
 
-    # return JSONResponse(status_code=status.HTTP_200_OK, content=latest_id_str)
     return latest_id
 
 
@@ -71,10 +66,7 @@ async def save(new_data):
 
 async def save_db(new_data):
     latest_id = await get_latest_db_id()
-    # print(latest_id)
-    # print("latest id", latest_id)
     await db["data"].update_one({"_id": latest_id}, {"$set": jsonable_encoder({"data": new_data})})
-    # print("Updated")
 
 
 def get_current_sensor_db(current_db, sensor_type, sensor_name):
@@ -94,6 +86,7 @@ def get_current_sensor_db(current_db, sensor_type, sensor_name):
 async def db_is_empty():
     db = await get_db()
     return db == {}
+
 
 @app.post("/append-to-db", response_description="Returned database dict")
 async def append_to_db(new_raw_data_model: SensorDataModel):
@@ -117,7 +110,6 @@ async def append_to_db(new_raw_data_model: SensorDataModel):
         "timestamp": new_raw_data["timestamp"]
     }
     current_sensor_db.append(new_sensor_entry)
-    # current_db[new_raw_data["type"]][new_raw_data["name"]] = current_sensor_db
 
     print(current_db)
     await save(current_db)
@@ -132,18 +124,19 @@ async def create_db():
     return JSONResponse(status_code=status.HTTP_201_CREATED, content="")
 
 
-if __name__ == '__main__':
-    data = {
-        "name": "AA",
-        "type": "AA2224",
-        "pressure": 12.5,
-        "temperature": 0,
-        "timestamp": "10001236"
-    }
+# if __name__ == '__main__':
+    # Example input
+    # data = {
+    #     "name": "AA",
+    #     "type": "AA2224",
+    #     "pressure": 12.5,
+    #     "temperature": 0,
+    #     "timestamp": "10001236"
+    # }
+    #
+    # data = mapper.dict_to_model(data)
 
-    data = mapper.dict_to_model(data)
-
-    resp1 = requests.post("http://127.0.0.1:8000/append-to-db", data.json())
+    # resp1 = requests.post("http://127.0.0.1:8000/append-to-db", data.json())
     # resp1 = requests.get("http://127.0.0.1:8000/return-db")
 
-    print(resp1.status_code, resp1.content)
+    # print(resp1.status_code, resp1.content)
