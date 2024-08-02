@@ -40,7 +40,7 @@ async def create_data(data: DataModel):
 
 @app.get("/data/", response_description="List All Data", response_model=List[DataModel])
 async def list_data():
-    data = await db["data"].find().to_list(1000)
+    data = await db["data"].find().to_list(1)
     return JSONResponse(status_code=status.HTTP_200_OK, content=data)
 
 
@@ -52,6 +52,7 @@ async def read_data(id: str):
 
 @app.put("/data/{id}", response_description="Update Data", response_model=DataModel)
 async def update_data(id: str, update: UpdateDataModel):
+
     await db["data"].update_one({"_id": id}, {"$set": jsonable_encoder(update)})
     updated_data = await db["data"].find_one({"_id": id})
 
@@ -68,9 +69,9 @@ if __name__ == '__main__':
     new_data = UpdateDataModel(name="Updated Test")
     answer1 = requests.post("http://127.0.0.1:8000/data/", data.json())
     answer2 = requests.put(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}", new_data.json())
-    answer3 = requests.delete(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}")
-    answer4 = requests.get(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}")
+    # answer3 = requests.delete(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}")
+    # answer4 = requests.get(f"http://127.0.0.1:8000/data/{json.loads(answer1.content)['_id']}")
     print(answer1.content)
     print(answer2.content)
-    print(answer3.content)
-    print(answer4.content)
+    # print(answer3.content)
+    # print(answer4.content)
