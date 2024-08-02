@@ -158,7 +158,7 @@ async def database_backup():
 
     data_to_save = []
     for sensor_description in all_sensors:
-        data_found: [dict[str, str, int, float]] = await find_data(sensor_description)
+        data_found= await find_data(sensor_description)
         data_to_save.append(sorted(data_found, key=lambda x: x["time"], reverse=True)[0])
 
     data = dumps(data_to_save)
