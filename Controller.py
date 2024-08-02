@@ -24,11 +24,11 @@ class Controller():
             print(requests.post("http://127.0.0.1:8002/append-to-db", sensor_input))
 
     def update_view(self):
-        db_response = requests.get("http://127.0.0.1:8000/return-db")
+        db_response = requests.get("http://127.0.0.1:8002/return-db")
         all_data = db_response.content
         all_data_model = self.get_all_data_model_from_dict(all_data)
 
-        requests.post("https://127.0.0.1:8000/update-view", all_data_model)
+        requests.post("https://127.0.0.1:8003/update-view", all_data_model)
 
     def get_all_data_model_from_dict(self, all_data):
         AllDataModel = create_model("AllData", **all_data)
