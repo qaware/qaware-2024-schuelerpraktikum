@@ -116,7 +116,7 @@ class Bodenstation(object):
         if not os.path.exists("fehlerspeicher/"):
             os.makedirs("fehlerspeicher/")
         with open(file_name, "w") as file:
-            json.dump(self.fehlerspeicher, file)
+            json.dump(self.fehlerspeicher, file, indent=2)
 
 
 
