@@ -47,6 +47,9 @@ class DataGenerator:
             SensorKey(name="oxygen_tank_2", type="gas_valve"),
             SensorKey(name="hydrogen_tank_1", type="gas_valve"),
             # SensorKey(name="hydrogen_tank_2", type="gas_valve")
+            SensorKey(name='panel_1', type='radient_value'),
+            SensorKey(name='panel_2', type='radient_value'),
+            SensorKey(name='panel_3', type='radient_value')
         ]
 
     def generate_new_sensor_data(self):
@@ -58,6 +61,8 @@ class DataGenerator:
             value = random.uniform(0.5, 9.0)
         elif selected_key.type == 'thruster':
             value = random.uniform(200,500)
+        elif selected_key.type == 'radient_value':
+            value = random.uniform(50,250)
 
         sensor_data = Sensor(
             name=selected_key.name,
