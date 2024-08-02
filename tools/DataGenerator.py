@@ -36,17 +36,17 @@ class DataGenerator:
         self.available_sensors: list[SensorKey] = [
             SensorKey(name="thruster_1.a", type="thruster"),
             SensorKey(name="thruster_1.b", type="thruster"),
-            #SensorKey(name="thruster_1.c", type="thruster"),
-            #SensorKey(name="thruster_2.a", type="thruster"),
-            #SensorKey(name="thruster_2.b", type="thruster"),
-            #SensorKey(name="thruster_2.c", type="thruster"),
-            #SensorKey(name="thruster_3.a", type="thruster"),
-            #SensorKey(name="thruster_3.b", type="thruster"),
-            #SensorKey(name="thruster_3.c", type="thruster"),
+            SensorKey(name="thruster_1.c", type="thruster"),
+            # SensorKey(name="thruster_2.a", type="thruster"),
+            # SensorKey(name="thruster_2.b", type="thruster"),
+            # SensorKey(name="thruster_2.c", type="thruster"),
+            # SensorKey(name="thruster_3.a", type="thruster"),
+            # SensorKey(name="thruster_3.b", type="thruster"),
+            # SensorKey(name="thruster_3.c", type="thruster"),
             SensorKey(name="oxygen_tank_1", type="gas_valve"),
             SensorKey(name="oxygen_tank_2", type="gas_valve"),
-            #SensorKey(name="hydrogen_tank_1", type="gas_valve"),
-            #SensorKey(name="hydrogen_tank_2", type="gas_valve")
+            SensorKey(name="hydrogen_tank_1", type="gas_valve"),
+            # SensorKey(name="hydrogen_tank_2", type="gas_valve")
         ]
 
     def generate_new_sensor_data(self):
@@ -108,4 +108,4 @@ if __name__ == '__main__':
         data = generator.generate_new_sensor_data()
         generator.store_sensor_data(data=data)
         print(f"Sucessfully stored: {data}")
-        time.sleep(2)
+        time.sleep(0.5)

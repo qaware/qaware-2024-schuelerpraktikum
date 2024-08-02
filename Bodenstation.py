@@ -11,8 +11,10 @@ class Bodenstation(object):
         self.path = path
         self.fehlerspeicher = {'thruster_1.a': [],
                                'thruster_1.b': [],
+                               'thruster_1.c': [],
                                'oxygen_tank_1': [],
                                'oxygen_tank_2': [],
+                               'hydrogen_tank_1': [],
                                'unkown': []}
 
 
@@ -124,4 +126,4 @@ b = Bodenstation('data/')
 while True:
     b.work()
     b.log()
-    sleep(2)
+    sleep(0.4)

@@ -44,7 +44,7 @@ class Animation(object):
         counter = 0
         while True:
             counter += 1
-            if counter%120 == 0:
+            if counter%30 == 0:
                 self.sensorKnotrollscreen_Start(fenster)
             for event in py.event.get():
                 # Beenden bei [ESC] oder [X]
