@@ -1,12 +1,7 @@
 import requests
 import os
 import json
-
 from BenutzerData import *
-# TODO: Wie erhalten wir für uns interessante Informationen von der Verwaltung?
-# TODO: Was sind interessante Daten und welche benötigen wir unter Umständen gar nicht?
-# TODO: Wie gehen wir mit beschädigten bzw. falschen Informationen um?
-# TODO: Wie stellen wir die Informationen bestmöglich für den Nutzer da?
 
 class Animation(object):
     def __init__(self, display, colors, fonts):
